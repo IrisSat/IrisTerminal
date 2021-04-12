@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "usart.h": "c",
+        "csp_if_kiss.h": "c",
+        "csp_thread.h": "c",
+        "windows.h": "c",
+        "csp.h": "c",
+        "libserialport_internal.h": "c",
+        "usbioctl.h": "c",
+        "cfgmgr32.h": "c"
+    }
+}
