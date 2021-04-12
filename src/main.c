@@ -141,6 +141,6 @@ static void printHelp(int argc, char ** argv){
 
     for(int i=0; i< NUM_COMMANDS; i++){
 
-        printf("\t%s\n",commandTable[i]);
+        printf("\t%s\n",commandTable[i].name);
     }
 }
