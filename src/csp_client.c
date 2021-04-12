@@ -122,11 +122,11 @@ void ping(int argc,char **argv){
     }
     else{
         int pingAddr = atoi(argv[1]);
-    csp_thread_handle_t handle_client;
-    csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
-        // int pingResult;
-        // pingResult = csp_ping(pingAddr, 60000, 100, CSP_O_NONE);
-        // printf("Ping with payload of %d bytes, took %d ms\n", 100, pingResult);
+    // csp_thread_handle_t handle_client;
+    // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
+        int pingResult;
+        pingResult = csp_ping(pingAddr, 60000, 100, CSP_O_NONE);
+        printf("Ping with payload of %d bytes, took %d ms\n", 100, pingResult);
     }
 
 
