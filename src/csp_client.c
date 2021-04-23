@@ -8,7 +8,7 @@
 #include "csp_client.h"
 
 #define PORT 10
-#define MY_ADDRESS 1
+#define MY_ADDRESS 9
 #define CDH_ADDRESS 0
 
 #define SERVER_TIDX 0
@@ -65,16 +65,29 @@ int startcsp(char * comPort,int baudRate){
 
 	usart_set_callback(my_usart_rx);
 
-    res = csp_route_set(0, &csp_if_kiss, CSP_NODE_MAC);
+    res = csp_route_set(4, &csp_if_kiss, CSP_NODE_MAC);
+    
         if(res != CSP_ERR_NONE){
         printf("ERROR");
         return -1;
     }
+
+    res = csp_route_set(5, &csp_if_kiss, CSP_NODE_MAC);
+    
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
     res = csp_route_start_task(0, 0);
         if(res != CSP_ERR_NONE){
         printf("ERROR");
         return -1;
     }
+
+    csp_conn_print_table();
+    csp_route_print_table();
+    csp_route_print_interfaces();
     
     return 0;
 }
@@ -109,28 +122,108 @@ CSP_DEFINE_TASK(task_client) {
 CSP_DEFINE_TASK(task_ping){
         int* pingAddr= (int*)param;
         int pingResult;
-        pingResult = csp_ping(*pingAddr, 60000, 100, CSP_O_NONE);
+        pingResult = csp_ping(*pingAddr, 60000, 200, CSP_O_NONE);
         printf("Ping with payload of %d bytes, took %d ms\n", 100, pingResult);
         return CSP_TASK_RETURN;
 }
 
 void ping(int argc,char **argv){
 
-    if(argc != 2){
+    if(argc < 2){
         printf("Not enough inputs\n");
 
     }
     else{
         int pingAddr = atoi(argv[1]);
+        int len = 100;
+        if(argc == 3){
+            len = atoi(argv[2]);
+        }
     // csp_thread_handle_t handle_client;
     // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
         int pingResult;
-        pingResult = csp_ping(pingAddr, 60000, 100, CSP_O_NONE);
-        printf("Ping with payload of %d bytes, took %d ms\n", 100, pingResult);
+        pingResult = csp_ping(pingAddr, 5000, len, CSP_O_NONE);
+        printf("Ping with payload of %d bytes, took %d ms\n", len, pingResult);
     }
-
-
-
 }
+
+void listProcess(int argc,char **argv){
+
+    if(argc != 2){
+        printf("Not enough inputs\n");
+
+    }
+    else{
+        int addr = atoi(argv[1]);
+    // csp_thread_handle_t handle_client;
+    // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
+        csp_ps(addr,5000);
+    }
+}
+
+void uptime(int argc,char **argv){
+
+    if(argc != 2){
+        printf("Not enough inputs\n");
+
+    }
+    else{
+        int addr = atoi(argv[1]);
+    // csp_thread_handle_t handle_client;
+    // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
+        csp_uptime(addr,5000);
+    }
+}
+
 void runDiagnostics(int argc,char **argv){}
 void getNetworkInfo(int argc,char **argv){}
+
+
+int csp_transaction_2port(uint8_t prio, uint8_t dest, uint8_t port, uint8_t rx_port, uint32_t timeout, void * outbuf, int outlen, void * inbuf, int inlen) {
+
+    // csp_conn_t * conn = csp_connect(prio, dest, port, 0, CSP_CONNECTION_SO);
+
+	// int size = (inlen > outlen) ? inlen : outlen;
+	// csp_packet_t * packet = csp_buffer_get(size);
+	// if (packet == NULL){
+    //     csp_close(conn);
+	// 	return 0;
+    // }
+
+	// /* Copy the request */
+	// if (outlen > 0 && outbuf != NULL)
+	// 	memcpy(packet->data, outbuf, outlen);
+	// packet->length = outlen;
+
+	// if (!csp_send(conn, packet, timeout)) {
+	// 	csp_buffer_free(packet);
+    //     csp_close(conn);
+	// 	return 0;
+	// }
+
+    // // csp_close(conn);
+	// /* If no reply is expected, return now */
+	// if (inlen == 0)
+	// 	return 1;
+
+    // // conn = csp_connect(prio, dest, rx_port, 0, CSP_CONNECTION_SO);
+	// packet = csp_read(conn, timeout);
+	// if (packet == NULL){
+    //     csp_close(conn);
+	// 	return 0;
+    //     }
+
+	// if ((inlen != -1) && ((int)packet->length != inlen)) {
+	// 	csp_log_error("Reply length %u expected %u", packet->length, inlen);
+	// 	csp_buffer_free(packet);
+    //     csp_close(conn);
+	// 	return 0;
+	// }
+
+	// memcpy(inbuf, packet->data, packet->length);
+	// int length = packet->length;
+	// csp_buffer_free(packet);
+    // csp_close(conn);
+	// return length;
+
+}

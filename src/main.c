@@ -24,11 +24,13 @@ typedef struct{
     void (*func)(int,char**);
 }cmd_t;
 
-#define NUM_COMMANDS    3
+#define NUM_COMMANDS    5
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp},
     {"send_image",sendImage},
-    {"ping",ping}
+    {"ping",ping},
+    {"listProcess",listProcess},
+    {"uptime",uptime},
 };
 
 int makeargs(char *args, int *argc, char ***aa) {

@@ -99,13 +99,13 @@ void usart_init(struct usart_conf * conf) {
 
 unsigned WINAPI prvRxTask(void* params){
 
-    uint8_t rxBuff[10];
+    uint8_t rxBuff[1000];
     int bytesRead;
     while(isListening){
 
     //     sp_wait(event_set, 0);
     //    bytesWaiting =  sp_input_waiting(serialPort)
-    bytesRead = sp_blocking_read_next(serialPort,rxBuff,10,0);
+    bytesRead = sp_blocking_read_next(serialPort,rxBuff,1000,0);
 
         if( usart_callback != NULL ){
                        usart_callback(rxBuff, (size_t)bytesRead, NULL);

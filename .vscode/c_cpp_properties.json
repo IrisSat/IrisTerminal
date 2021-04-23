@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/Libraries/libcsp",
                 "${workspaceFolder}/Libraries/libserialport",
-                "${workspaceFolder}/../../libserialport"
+                "${workspaceFolder}/../../libserialport",
+                "${workspaceFolder}/../../libcsp"
             ],
             "defines": [
                 "_DEBUG",
