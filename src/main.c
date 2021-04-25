@@ -18,19 +18,22 @@ struct arg_file *o, *file;
 struct arg_end *end;
 
 static void printHelp(int argc, char ** argv);
+static void quitTerminal(int argc, char ** argv);
 
 typedef struct{
     char* name;
     void (*func)(int,char**);
+    char * helpString;
 }cmd_t;
 
-#define NUM_COMMANDS    5
+#define NUM_COMMANDS    6
 cmd_t commandTable[NUM_COMMANDS]= {
-    {"help", printHelp},
-    {"send_image",sendImage},
-    {"ping",ping},
-    {"listProcess",listProcess},
-    {"uptime",uptime},
+    {"help", printHelp, "Prints the help message."},
+    {"send_image",sendImage,"Sends an image to the payload subsystem"},
+    {"ping",ping,"Pings the chosen subsystem, sending a packet of data and timing the response"},
+    {"listProcess",listProcess,"Lists the tasks and their status of the chosen subsystem"},
+    {"uptime",uptime,"Prints how long a subsystem has been turned on for."},
+    {"quit",quitTerminal,"Exit the terminal."},
 };
 
 int makeargs(char *args, int *argc, char ***aa) {
@@ -138,11 +141,15 @@ int main(int argc, char **argv) {
 static void printHelp(int argc, char ** argv){
 
     printf("This terminal provides commands for interacting with the Iris satellite.\n");
-    printf("Type \"command\" help to see help for a specific command.\n");
+    printf("Type \"command\" help to see detailed help for a specific command.\n");
     printf("Here is a list of available commands:\n");
 
     for(int i=0; i< NUM_COMMANDS; i++){
 
-        printf("\t%s\n",commandTable[i].name);
+        printf("\t%s - %s\n",commandTable[i].name,commandTable[i].helpString);
     }
+}
+
+static void quitTerminal(int argc, char ** argv){
+    exit(0);
 }

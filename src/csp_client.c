@@ -6,6 +6,7 @@
 #include <csp/arch/csp_thread.h>
 
 #include "csp_client.h"
+#include "networkConfig.h"
 
 #define PORT 10
 #define MY_ADDRESS 9
@@ -134,13 +135,20 @@ void ping(int argc,char **argv){
 
     }
     else{
-        int pingAddr = atoi(argv[1]);
+
+        //Get the address from the user input
+        int pingAddr = getAddr(argv[1]);
+        if(pingAddr<0){ 
+            printf("Invalid addresss or subsystem...\n");
+            return;
+        }
+
+        //Check if the user specified the ping payload size.
         int len = 100;
         if(argc == 3){
             len = atoi(argv[2]);
         }
-    // csp_thread_handle_t handle_client;
-    // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
+
         int pingResult;
         pingResult = csp_ping(pingAddr, 5000, len, CSP_O_NONE);
         printf("Ping with payload of %d bytes, took %d ms\n", len, pingResult);
@@ -154,9 +162,13 @@ void listProcess(int argc,char **argv){
 
     }
     else{
-        int addr = atoi(argv[1]);
-    // csp_thread_handle_t handle_client;
-    // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
+
+        int addr = getAddr(argv[1]);
+        if(addr<0){ 
+            printf("Invalid addresss or subsystem...\n");
+            return;
+        }
+
         csp_ps(addr,5000);
     }
 }
@@ -168,9 +180,13 @@ void uptime(int argc,char **argv){
 
     }
     else{
-        int addr = atoi(argv[1]);
-    // csp_thread_handle_t handle_client;
-    // csp_thread_create(task_client, "PING", 1000, (void*)&pingAddr, 0, &handle_client);
+
+        int addr = getAddr(argv[1]);
+        if(addr<0){ 
+            printf("Invalid addresss or subsystem...\n");
+            return;
+        }
+
         csp_uptime(addr,5000);
     }
 }

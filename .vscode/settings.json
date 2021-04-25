@@ -8,6 +8,7 @@
         "libserialport_internal.h": "c",
         "usbioctl.h": "c",
         "cfgmgr32.h": "c",
-        "csp_types.h": "c"
+        "csp_types.h": "c",
+        "networkconfig.h": "c"
     }
 }
