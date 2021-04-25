@@ -1,6 +1,6 @@
-/**
- * Build this example on linux with:
- * ./waf configure --enable-examples --enable-if-kiss --with-driver-usart=linux --enable-crc32 clean build
+/*
+ * 
+ * 
  */
 
 #include <stdio.h>
@@ -10,33 +10,126 @@
 #include "argtable3.h"
 
 #include "payloadCommands.h"
+#include "cdhCommands.h"
 
-/* global arg_xxx structs */
-struct arg_lit *verb, *help, *version;
-struct arg_int *level;
-struct arg_file *o, *file;
-struct arg_end *end;
-
+//Local Functions
 static void printHelp(int argc, char ** argv);
 static void quitTerminal(int argc, char ** argv);
+int setupTerminal();
+char * getline_(void);
+int makeargs(char *args, int *argc, char ***aa);
 
+//Structure for the commands.
 typedef struct{
-    char* name;
-    void (*func)(int,char**);
-    char * helpString;
+    char* name; //The name the user must type to use the command.
+    void (*func)(int,char**);  //A pointer to the command funciton that will be run. Takes the standard argc,argv parameters.
+    char * helpString; //The initial help text shown. Put more detailed help in the command function itself.
 }cmd_t;
 
-#define NUM_COMMANDS    6
+//Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
+#define NUM_COMMANDS    14
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
     {"ping",ping,"Pings the chosen subsystem, sending a packet of data and timing the response"},
     {"listProcess",listProcess,"Lists the tasks and their status of the chosen subsystem"},
     {"uptime",uptime,"Prints how long a subsystem has been turned on for."},
+    {"getPldTelem",getPayloadTelemetry,"Gets the latest payload telemetry data from CDH."},
+    {"checkPldTelem",checkPayloadTelemetry,"Checks what payload telemetry is collected on CDH."},
+    {"requestPldTelem",requestPayloadTelemetry,"Tells CDH to request new telemtry from payload."},
+    {"getCdhTelem",getCdhTelemetry,"Gets the latest CDH telemetry data from CDH."},
+    {"checkCdhTelem",checkCdhTelemetry,"Checks what CDH telemetry is collected on CDH."},
+    {"requestCdhTelem",requestCdhTelemetry,"Tells CDH to generate new CDH telemetry."},
+    {"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."},
+    {"cancelTTT",cancelTTT,"Cancels a time tagged task."},
     {"quit",quitTerminal,"Exit the terminal."},
 };
 
+int main(int argc, char **argv) {
+
+    char *cmd;
+    int n;
+    int argc_;
+    char ** argv_;
+
+    setupTerminal();
+
+    //User must specify 2 parameters(COM port and baud rate), so argc == 3
+    if(argc !=3){
+        return 0;
+    }
+    else{
+        startcsp(argv[1],atoi(argv[2]));
+    }
+    while(1) {
+        //CMD line loop...
+
+        printf("Iris>");
+        cmd = getline_();
+        makeargs(cmd,&argc_,&argv_);
+
+        for(int i=0; i<NUM_COMMANDS; i++){
+            
+            //If the command entered by the user matches a command, call the command function.
+            if(strcmp(commandTable[i].name,argv_[0]) ==0){
+                commandTable[i].func(argc_,argv_);
+                break;
+            }
+        }
+
+    }
+
+    return 0;
+
+}
+
+static void printHelp(int argc, char ** argv){
+
+    printf("This terminal provides commands for interacting with the Iris satellite.\n");
+    printf("Type \"command\" help to see detailed help for a specific command.\n");
+    printf("Here is a list of available commands:\n");
+
+    for(int i=0; i< NUM_COMMANDS; i++){
+        //Print the name and help string of each command in the table. Using color for the command name to make it easier to read.
+        printf("\t\x1b[36m %s \x1b[0m - %s\n",commandTable[i].name,commandTable[i].helpString);
+    }
+}
+
+static void quitTerminal(int argc, char ** argv){
+    //Just quit the program, add any other clean up if necessary.
+    exit(0);
+}
+
+int setupTerminal(){
+    //This configures the powershell terminal to support color.
+    //https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#samples
+    //https://stackoverflow.com/questions/51680709/colored-text-output-in-powershell-console-using-ansi-vt100-codes
+    
+    // Set output mode to handle virtual terminal sequences
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE)
+    {
+        return GetLastError();
+    }
+
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode))
+    {
+        return GetLastError();
+    }
+
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    if (!SetConsoleMode(hOut, dwMode))
+    {
+        return GetLastError();
+    }
+}
+
+
 int makeargs(char *args, int *argc, char ***aa) {
+    //This takes a string and parses it into argc(number of arguments) and argv(array of arguments).
+    //From Andi on stackopverflow: https://stackoverflow.com/a/24229245
+
     char *buf = strdup(args);
     int c = 1;
     char *delim;
@@ -58,6 +151,9 @@ int makeargs(char *args, int *argc, char ***aa) {
 }
 
 char * getline_(void) {
+    //Reads a line from stdin.
+    //From Johannes Schaub: https://stackoverflow.com/a/314422
+
     char * line = malloc(1000), * linep = line;
     size_t lenmax = 1000, len = lenmax;
     int c;
@@ -89,67 +185,4 @@ char * getline_(void) {
     }
     *line = '\0';
     return linep;
-}
-
-int main(int argc, char **argv) {
-   
-   char *cmd;
-   int n;
-   int argc_;
-   char ** argv_;
-
-    //    void *argtable[] = {
-    //     help    = arg_litn(NULL, "help", 0, 1, "display this help and exit"),
-    //     version = arg_litn(NULL, "version", 0, 1, "display version info and exit"),
-    //     level   = arg_intn(NULL, "level", "<n>", 0, 1, "foo value"),
-    //     verb    = arg_litn("v", "verbose", 0, 1, "verbose output"),
-    //     o       = arg_filen("o", NULL, "myfile", 0, 1, "output file"),
-    //     file    = arg_filen(NULL, NULL, "<file>", 1, 100, "input files"),
-    //     end     = arg_end(20),
-    // };
-
-   //startcsp();
-    /* Wait for program to terminate (ctrl + c) */
-    if(argc !=3){
-        return 0;
-    }
-    else{
-        startcsp(argv[1],atoi(argv[2]));
-    }
-    while(1) {
-
-        printf("Iris>");
-        cmd = getline_();
-        makeargs(cmd,&argc_,&argv_);
-        // int nerrors;
-        // nerrors = arg_parse(argc_,argv_,argtable);
-
-        for(int i=0; i<NUM_COMMANDS; i++){
-
-            if(strcmp(commandTable[i].name,argv_[0]) ==0){
-                commandTable[i].func(argc_,argv_);
-                break;
-            }
-        }
-
-    }
-
-    return 0;
-
-}
-
-static void printHelp(int argc, char ** argv){
-
-    printf("This terminal provides commands for interacting with the Iris satellite.\n");
-    printf("Type \"command\" help to see detailed help for a specific command.\n");
-    printf("Here is a list of available commands:\n");
-
-    for(int i=0; i< NUM_COMMANDS; i++){
-
-        printf("\t%s - %s\n",commandTable[i].name,commandTable[i].helpString);
-    }
-}
-
-static void quitTerminal(int argc, char ** argv){
-    exit(0);
 }

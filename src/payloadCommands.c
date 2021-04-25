@@ -126,3 +126,22 @@ void sendImage(int argc, char **argv){
     END:
         printf("error\n");
 }
+
+void getPayloadTelemetry(int argc,char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to get recent telemtry from payload that is stored on CDH.\n");
+        printf("Usage: getPldTelem <item> <num>\n");
+        printf("\t <item>: The telemetry data you want: \n");
+        printf("\t\t pwrGood\n\t\t boardTemp\n\t\t sampleTemp\n\t\t sampleLoc\n\t\t error\n");
+        printf("\t <num>: The max number of items to get. Starting with the newest value.");
+    }
+    
+    else if(strcmp(argv[1],"pwrGood") ==0){
+
+    }
+
+}
+
+void checkPayloadTelemetry(int argc,char **argv){}
+void requestPayloadTelemetry(int argc,char **argv){}
