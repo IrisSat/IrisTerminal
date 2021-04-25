@@ -7,7 +7,6 @@
 #include <csp/csp.h>
 #include <csp/arch/csp_thread.h>
 #include "csp_client.h"
-#include "argtable3.h"
 
 #include "payloadCommands.h"
 #include "cdhCommands.h"
