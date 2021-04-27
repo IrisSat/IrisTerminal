@@ -22,103 +22,86 @@ static csp_iface_t csp_if_kiss;
 		csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
 	}
 
-int startcsp(char * comPort,int baudRate){
-    csp_debug_toggle_level(CSP_PACKET);
-    csp_debug_toggle_level(CSP_INFO);
 
-    int res = csp_buffer_init(10, 300);
-    if(res != CSP_ERR_NONE){
-        printf("ERROR");
-        return -1;
+
+CSP_DEFINE_TASK(task_server) {
+
+int running = 1;
+    csp_socket_t *socket = csp_socket(CSP_SO_NONE);
+    csp_conn_t *conn;
+    csp_packet_t *packet;
+    csp_packet_t *response;
+
+    // response = csp_buffer_get(sizeof(csp_packet_t) + 2);
+    // if( response == NULL ) {
+    //     fprintf(stderr, "Could not allocate memory for response packet!\n");
+    //     return CSP_TASK_RETURN;
+    // }
+    // response->data[0] = 'O';
+    // response->data[1] = 'K';
+    // response->length = 2;
+
+    csp_bind(socket, CSP_ANY);
+    csp_listen(socket, 5);
+
+    printf("Server task started\r\n");
+
+    while(running) {
+        if( (conn = csp_accept(socket, 10000)) == NULL ) {
+            continue;
+        }
+
+        while( (packet = csp_read(conn, 100)) != NULL ) {
+            switch( csp_conn_dport(conn) ) {
+                case CSP_TELEM_PORT:{
+                    uint8_t buff[256];
+                    memcpy(buff,packet->data,packet->length);
+                    buff[packet->length] = 0;
+                    printf("Received: %s\n",&buff[14]);
+
+                    csp_buffer_free(packet);
+                    
+                    break;
+                }
+                default:
+                    csp_service_handler(conn, packet);
+                    break;
+            }
+        }
+
+        csp_close(conn);
     }
 
-    res = csp_init(MY_ADDRESS);
-    if(res != CSP_ERR_NONE){
-        printf("ERROR");
-        return -1;
-    }
-
-    struct usart_conf conf;
-
-    #if defined(CSP_WINDOWS)
-        conf.device = comPort;
-        conf.baudrate = baudRate;
-        conf.databits = 8;
-        conf.paritysetting = NOPARITY;
-        conf.stopbits = ONESTOPBIT;
-        conf.checkparity = FALSE;
-    #elif defined(CSP_POSIX)
-        conf.device = argc != 2 ? "/dev/ttyUSB0" : argv[1];
-        conf.baudrate = 500000;
-    #elif defined(CSP_MACOSX)
-        conf.device = argc != 2 ? "/dev/tty.usbserial-FTSM9EGE" : argv[1];
-        conf.baudrate = 115200;
-    #endif
-
-	/* Run USART init */
-	usart_init(&conf);
-
-    /* Setup CSP interface */
-	
-	static csp_kiss_handle_t csp_kiss_driver;
-	csp_kiss_init(&csp_if_kiss, &csp_kiss_driver, usart_putc, usart_insert, "KISS");
-		
-
-	usart_set_callback(my_usart_rx);
-
-    res = csp_route_set(4, &csp_if_kiss, CSP_NODE_MAC);
-    
-        if(res != CSP_ERR_NONE){
-        printf("ERROR");
-        return -1;
-    }
-
-    res = csp_route_set(5, &csp_if_kiss, CSP_NODE_MAC);
-    
-        if(res != CSP_ERR_NONE){
-        printf("ERROR");
-        return -1;
-    }
-
-    res = csp_route_start_task(0, 0);
-        if(res != CSP_ERR_NONE){
-        printf("ERROR");
-        return -1;
-    }
-
-    csp_conn_print_table();
-    csp_route_print_table();
-    csp_route_print_interfaces();
-    
-    return 0;
-}
-
-CSP_DEFINE_TASK(task_client) {
-
-    char outbuf = 'q';
-    char inbuf[3] = {0};
-    int pingResult;
-
-    for(int i = 50; i <= 200; i+= 50) {
-        pingResult = csp_ping(CDH_ADDRESS, 360000, 100, CSP_O_NONE);
-        printf("Ping with payload of %d bytes, took %d ms\n", i, pingResult);
-        csp_sleep_ms(1000);
-    }
-    csp_ps(CDH_ADDRESS, 1000);
-    csp_sleep_ms(1000);
-    csp_memfree(CDH_ADDRESS, 1000);
-    csp_sleep_ms(1000);
-    csp_buf_free(CDH_ADDRESS, 1000);
-    csp_sleep_ms(1000);
-    csp_uptime(CDH_ADDRESS, 1000);
-    csp_sleep_ms(1000);
-
-    // csp_transaction(0, CDH_ADDRESS, PORT, 1000, &outbuf, 1, inbuf, 2);
-    // printf("Quit response from server: %s\n", inbuf);
-    printf("Done task\n");
+    csp_buffer_free(response);
 
     return CSP_TASK_RETURN;
 }
+// CSP_DEFINE_TASK(task_client) {
+
+//     char outbuf = 'q';
+//     char inbuf[3] = {0};
+//     int pingResult;
+
+//     for(int i = 50; i <= 200; i+= 50) {
+//         pingResult = csp_ping(CDH_ADDRESS, 360000, 100, CSP_O_NONE);
+//         printf("Ping with payload of %d bytes, took %d ms\n", i, pingResult);
+//         csp_sleep_ms(1000);
+//     }
+//     csp_ps(CDH_ADDRESS, 1000);
+//     csp_sleep_ms(1000);
+//     csp_memfree(CDH_ADDRESS, 1000);
+//     csp_sleep_ms(1000);
+//     csp_buf_free(CDH_ADDRESS, 1000);
+//     csp_sleep_ms(1000);
+//     csp_uptime(CDH_ADDRESS, 1000);
+//     csp_sleep_ms(1000);
+
+//     // csp_transaction(0, CDH_ADDRESS, PORT, 1000, &outbuf, 1, inbuf, 2);
+//     // printf("Quit response from server: %s\n", inbuf);
+//     printf("Done task\n");
+
+//     return CSP_TASK_RETURN;
+// }
 
 CSP_DEFINE_TASK(task_ping){
         int* pingAddr= (int*)param;
@@ -242,4 +225,78 @@ int csp_transaction_2port(uint8_t prio, uint8_t dest, uint8_t port, uint8_t rx_p
     // csp_close(conn);
 	// return length;
 
+}
+
+int startcsp(char * comPort,int baudRate){
+    csp_debug_toggle_level(CSP_PACKET);
+    csp_debug_toggle_level(CSP_INFO);
+
+    int res = csp_buffer_init(10, 300);
+    if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
+    res = csp_init(MY_ADDRESS);
+    if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
+    struct usart_conf conf;
+
+    #if defined(CSP_WINDOWS)
+        conf.device = comPort;
+        conf.baudrate = baudRate;
+        conf.databits = 8;
+        conf.paritysetting = NOPARITY;
+        conf.stopbits = ONESTOPBIT;
+        conf.checkparity = FALSE;
+    #elif defined(CSP_POSIX)
+        conf.device = argc != 2 ? "/dev/ttyUSB0" : argv[1];
+        conf.baudrate = 500000;
+    #elif defined(CSP_MACOSX)
+        conf.device = argc != 2 ? "/dev/tty.usbserial-FTSM9EGE" : argv[1];
+        conf.baudrate = 115200;
+    #endif
+
+	/* Run USART init */
+	usart_init(&conf);
+
+    /* Setup CSP interface */
+	
+	static csp_kiss_handle_t csp_kiss_driver;
+	csp_kiss_init(&csp_if_kiss, &csp_kiss_driver, usart_putc, usart_insert, "KISS");
+		
+
+	usart_set_callback(my_usart_rx);
+
+    res = csp_route_set(4, &csp_if_kiss, CSP_NODE_MAC);
+    
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
+    res = csp_route_set(5, &csp_if_kiss, CSP_NODE_MAC);
+    
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
+    res = csp_route_start_task(0, 0);
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
+    csp_thread_handle_t handle_server;
+    csp_thread_create(task_server, "SERVER", 1000, NULL, 0, &handle_server);
+
+    csp_conn_print_table();
+    csp_route_print_table();
+    csp_route_print_interfaces();
+    
+    return 0;
 }

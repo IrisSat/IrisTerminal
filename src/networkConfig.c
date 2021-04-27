@@ -7,10 +7,10 @@
 int nicknameToAddress(char * name){
 
     if(strcmp(name,CDH_NICKNAME)==0){
-        return CDH_CSP_ADDR;
+        return CDH_CSP_ADDRESS;
     }
     else if(strcmp(name,PAYLOAD_NICKNAME) == 0){
-        return PAYLOAD_CSP_ADDR;
+        return PAYLOAD_CSP_ADDRESS;
     }
 
     return -1;

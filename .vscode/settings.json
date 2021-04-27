@@ -9,6 +9,10 @@
         "usbioctl.h": "c",
         "cfgmgr32.h": "c",
         "csp_types.h": "c",
-        "networkconfig.h": "c"
+        "networkconfig.h": "c",
+        "csp_client.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c",
+        "cdhcommands.h": "c"
     }
 }
