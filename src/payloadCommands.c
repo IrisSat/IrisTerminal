@@ -1,4 +1,5 @@
 #include "payloadCommands.h"
+#include "cdhCommands.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
@@ -147,6 +148,8 @@ void downloadImage(int argc, char **argv){
 
     imageDownloadState = 1;
     snprintf(imageDownloadFile,100,"%s",argv[1]);
+    char * args[3] = {"scheduleTTT", "0","now"};
+    scheduleTTT(3,args);
 
 }
 

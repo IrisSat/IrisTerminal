@@ -11,6 +11,8 @@ int csp_transaction_2port(uint8_t prio, uint8_t dest, uint8_t port, uint8_t rx_p
 void ping(int argc,char **argv);
 void listProcess(int argc,char **argv);
 void uptime(int argc,char **argv);
+void memFree(int argc,char **argv);
+void buffFree(int argc,char **argv);
 void runDiagnostics(int argc,char **argv);
 void getNetworkInfo(int argc,char **argv);
 

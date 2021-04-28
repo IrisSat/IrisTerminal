@@ -46,7 +46,7 @@ int running = 1;
     // response->length = 2;
 
     csp_bind(socket, CSP_ANY);
-    csp_listen(socket, 5);
+    csp_listen(socket, 10);
 
     printf("\nServer task started\r\n");
 
@@ -72,7 +72,13 @@ int running = 1;
                                 uint32_t numChunks = *((uint32_t*)&telem.data[sizeof(uint32_t)]);
                                 imageChunksLeft = numChunks;
                                 printf("Getting ready to receive image of %d bytes, in %d chunks.\n",size,numChunks);
+
+                                if(imageFileHandle != NULL) fclose(imageFileHandle);
+
                                 imageFileHandle = fopen(imageDownloadFile,"w");
+                                if(imageFileHandle == NULL){
+                                    printf("Could not open file %s\n",imageDownloadFile);
+                                }
                             }
                             break;
                         }
@@ -88,7 +94,7 @@ int running = 1;
                                 fclose(imageFileHandle);
                                 imageChunksLeft = 0;
                                 imageDownloadState =0;
-                                printf("Done receiving image");
+                                printf("Done receiving image.\n");
                             }
                         }
 
@@ -101,6 +107,7 @@ int running = 1;
                     csp_service_handler(conn, packet);
                     break;
             }
+            csp_buffer_free(packet);
         }
 
         csp_close(conn);
@@ -187,6 +194,43 @@ void listProcess(int argc,char **argv){
         }
 
         csp_ps(addr,5000);
+    }
+}
+
+
+void memFree(int argc,char **argv){
+
+    if(argc != 2){
+        printf("Not enough inputs\n");
+
+    }
+    else{
+
+        int addr = getAddr(argv[1]);
+        if(addr<0){ 
+            printf("Invalid addresss or subsystem...\n");
+            return;
+        }
+
+        csp_memfree(addr,5000);
+    }
+}
+
+void buffFree(int argc,char **argv){
+
+    if(argc != 2){
+        printf("Not enough inputs\n");
+
+    }
+    else{
+
+        int addr = getAddr(argv[1]);
+        if(addr<0){ 
+            printf("Invalid addresss or subsystem...\n");
+            return;
+        }
+
+        csp_buf_free(addr,5000);
     }
 }
 

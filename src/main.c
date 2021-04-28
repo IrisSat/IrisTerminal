@@ -7,6 +7,7 @@
 #include <csp/csp.h>
 #include <csp/arch/csp_thread.h>
 #include "csp_client.h"
+#include <unistd.h>
 
 #include "payloadCommands.h"
 #include "cdhCommands.h"
@@ -26,13 +27,15 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    17
+#define NUM_COMMANDS    19
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
     {"ping",ping,"Pings the chosen subsystem, sending a packet of data and timing the response"},
     {"listProcess",listProcess,"Lists the tasks and their status of the chosen subsystem"},
     {"uptime",uptime,"Prints how long a subsystem has been turned on for."},
+    {"memfree",memFree,"Prints the free memory of a subsystem."},
+    {"buffFree",buffFree,"Prints the number of csp buffers available on a subsystem."},
     {"getPldTelem",getPayloadTelemetry,"Gets the latest payload telemetry data from CDH."},
     {"checkPldTelem",checkPayloadTelemetry,"Checks what payload telemetry is collected on CDH."},
     {"requestPldTelem",requestPayloadTelemetry,"Tells CDH to request new telemtry from payload."},
@@ -55,6 +58,9 @@ int main(int argc, char **argv) {
     char ** argv_;
 
     setupTerminal();
+    char cwd[255];
+    getcwd(cwd,255);
+    printf("Current directory: %s\n",cwd);
 
     //User must specify 2 parameters(COM port and baud rate), so argc == 3
     if(argc !=3){
