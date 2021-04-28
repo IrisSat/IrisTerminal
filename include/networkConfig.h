@@ -1,6 +1,9 @@
 #ifndef NETWORK_CONFIG_H_
 #define NETWORK_CONFIG_H_
 
+#include "telemetry.h"
+#include <time.h>
+
 //Define the csp address of all devices in the network.
 #define POWER_CSP_ADDRESS	2
 #define COMMS_CSP_ADDRESS	3
@@ -19,5 +22,8 @@
 
 int nicknameToAddress(char * name);
 int getAddr(char * arg);
+int timeToCalendar(struct tm *time, Calendar_t *cal);
+void getCalendarNow(Calendar_t* cal);
+void printCalendar(Calendar_t* cal);
 
 #endif

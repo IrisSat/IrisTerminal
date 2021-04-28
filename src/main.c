@@ -26,7 +26,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    14
+#define NUM_COMMANDS    17
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
@@ -39,6 +39,9 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"getCdhTelem",getCdhTelemetry,"Gets the latest CDH telemetry data from CDH."},
     {"checkCdhTelem",checkCdhTelemetry,"Checks what CDH telemetry is collected on CDH."},
     {"requestCdhTelem",requestCdhTelemetry,"Tells CDH to generate new CDH telemetry."},
+    {"setCdhTime",setCdhTime,"Updates the time on CDH."},
+    {"getCdhTime",getCdhTime,"Gets the time on CDH."},
+    {"downloadImage",downloadImage,"Gets an image from payload."},
     {"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."},
     {"cancelTTT",cancelTTT,"Cancels a time tagged task."},
     {"quit",quitTerminal,"Exit the terminal."},
@@ -66,7 +69,7 @@ int main(int argc, char **argv) {
         printf("Iris>");
         cmd = getline_();
         makeargs(cmd,&argc_,&argv_);
-
+        
         for(int i=0; i<NUM_COMMANDS; i++){
             
             //If the command entered by the user matches a command, call the command function.
@@ -75,6 +78,7 @@ int main(int argc, char **argv) {
                 break;
             }
         }
+
 
     }
 

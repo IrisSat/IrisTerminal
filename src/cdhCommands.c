@@ -10,34 +10,139 @@
 #include <csp/arch/csp_thread.h>
 #include "csp_client.h"
 #include "networkConfig.h"
+#include "telemetry.h"
+#include <time.h>
 
 
 void getCdhTelemetry(int argc, char **argv){}
 void checkCdhTelemetry(int argc, char **argv){}
 void requestCdhTelemetry(int argc, char **argv){}
+
 void scheduleTTT(int argc, char **argv){
 
-    uint8_t telemPacket[10+9];
-    telemPacket[8] = CDH_SCHEDULE_TTT_CMD;
-    telemPacket[9] = 5;
-    telemPacket[10] = atoi(argv[1]);
-    Calendar_t when={0};
-    when.day= atoi(argv[2]);
-    when.hour = atoi(argv[3]);
-    when.minute = atoi(argv[4]);
+    telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    timeToCalendar(tm,&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+    cmd.length = sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+
+    uint8_t cmd_data[sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+    cmd.data = cmd_data;
+
+    cmd_data[0] = atoi(argv[1]);//First arg is the task code.
+    char * test = argv[2];
+    if(argc >3){
+        Calendar_t when={0};
+        when.day= atoi(argv[2]);
+        when.hour = atoi(argv[3]);
+        when.minute = atoi(argv[4]);
+        when.month = atoi(argv[5]);
+        when.year = atoi(argv[6]);
+        when.weekday = 0; //This really isn't ever used and is just a pain, set to 0...
+        when.weekday =1; //Not used but must be 1.
+        
+        memcpy(&cmd_data[1],&when,sizeof(Calendar_t));
+    }
+    else if(strcmp(argv[2],"now")==0){
+        memcpy(&cmd_data[1],&now,sizeof(Calendar_t)); //Just copy the current time.
+    }
+    else{
+        printf("Wrong number of args... try scheduleTTT help for instructions on how to use this function.\n");
+        return;
+    }
+
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+    // csp_conn_t * conn;
+	// csp_packet_t * outPacket;
+	// conn = csp_connect(2,CDH_CSP_ADDRESS,CSP_CMD_PORT,1000,0);	//Create a connection. This tells CSP where to send the data (address and destination port).
+	// outPacket = csp_buffer_get(19);
+
+	// memcpy(&outPacket->data[0],telemPacket,19);
     
-    memcpy(&telemPacket[11],&when,8);
 
-    csp_conn_t * conn;
-	csp_packet_t * outPacket;
-	conn = csp_connect(2,CDH_CSP_ADDRESS,CSP_CMD_PORT,1000,0);	//Create a connection. This tells CSP where to send the data (address and destination port).
-	outPacket = csp_buffer_get(19);
+	// outPacket->length = 19;
 
-	memcpy(&outPacket->data[0],telemPacket,19);
-    
-
-	outPacket->length = 19;
-
-    int result = csp_send(conn,outPacket,1000);
+    // int result = csp_send(conn,outPacket,1000);
 }
 void cancelTTT(int argc,char **argv){}
+
+void setCdhTime(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to set the time on CDH. \n");
+        printf("Should only be needed for testing or inital setup, since the external RTC can keep time with battery.\n");
+        printf("Usage: setCdhTime now\n");
+        printf("Usage: setCdhTime <s> <min> <hr> <day> <month> <year>\n");
+        printf("Time Format: 24 hour, month 1-12, year since 2000\n");
+        printf("Example: So to set the time to June 4 2021 at 6:30:00 pm\n");
+        printf("\t setCdhTime 0 30 18 1 6 21");
+
+        return;
+    }
+
+    telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = CDH_SET_TIME_CMD;
+    cmd.length = sizeof(Calendar_t); //We send an updated time.
+
+    uint8_t cmd_data[sizeof(Calendar_t)] = {0};
+    cmd.data = cmd_data;
+
+    char * test = argv[1];
+    if(argc >2){
+        Calendar_t when={0};
+        when.second= atoi(argv[2]);
+        when.minute = atoi(argv[3]);
+        when.hour = atoi(argv[4]);
+        when.day = atoi(argv[5]);
+        when.month = atoi(argv[6]);
+        when.year = atoi(argv[7]);
+        when.weekday = 0; //This really isn't ever used and is just a pain, set to 0...
+        when.weekday =1; //Not used but must be 1.
+        
+        memcpy(cmd_data,&when,sizeof(Calendar_t));
+    }
+    else if(strcmp(argv[1],"now")==0){
+        memcpy(cmd_data,&now,sizeof(Calendar_t)); //Just copy the current time.
+    }
+    else{
+        printf("Wrong number of args... try setCdhTime help for instructions on how to use this function.\n");
+        return;
+    }
+
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void getCdhTime(int argc, char **argv){
+
+    telemetryPacket_t request;
+
+    request.telem_id = CDH_GET_TIME_CMD;
+    Calendar_t now;
+    getCalendarNow(&now);
+    request.timestamp = now;
+    request.length=0;
+    request.data=NULL;
+
+    telemetryPacket_t response;
+
+    int result = csp_transaction(2,CDH_CSP_ADDRESS,CSP_CMD_PORT,5000,&request,TELEM_HEADER_SIZE,&response,TELEM_HEADER_SIZE);
+    if(result<=0){
+        printf("csp transaction error: %d\n",result);
+    }
+    else{
+        printCalendar(&response.timestamp);
+
+    }
+}

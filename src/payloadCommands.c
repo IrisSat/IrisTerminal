@@ -143,5 +143,12 @@ void getPayloadTelemetry(int argc,char **argv){
 
 }
 
+void downloadImage(int argc, char **argv){
+
+    imageDownloadState = 1;
+    snprintf(imageDownloadFile,100,"%s",argv[1]);
+
+}
+
 void checkPayloadTelemetry(int argc,char **argv){}
 void requestPayloadTelemetry(int argc,char **argv){}

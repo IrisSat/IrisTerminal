@@ -7,6 +7,7 @@
 
 #include "csp_client.h"
 #include "networkConfig.h"
+#include "telemetry.h"
 
 #define PORT 10
 #define MY_ADDRESS 9
@@ -17,12 +18,15 @@
 #define USART_HANDLE 0
 
 static csp_iface_t csp_if_kiss;
-	/* Setup callback from USART RX to KISS RS */
-	void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
-		csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
-	}
+/* Setup callback from USART RX to KISS RS */
+void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
+    csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
+}
 
-
+int imageDownloadState=0;
+char imageDownloadFile[100] = "";
+FILE * imageFileHandle;
+int imageChunksLeft =0;
 
 CSP_DEFINE_TASK(task_server) {
 
@@ -44,7 +48,7 @@ int running = 1;
     csp_bind(socket, CSP_ANY);
     csp_listen(socket, 5);
 
-    printf("Server task started\r\n");
+    printf("\nServer task started\r\n");
 
     while(running) {
         if( (conn = csp_accept(socket, 10000)) == NULL ) {
@@ -54,12 +58,42 @@ int running = 1;
         while( (packet = csp_read(conn, 100)) != NULL ) {
             switch( csp_conn_dport(conn) ) {
                 case CSP_TELEM_PORT:{
-                    uint8_t buff[256];
-                    memcpy(buff,packet->data,packet->length);
-                    buff[packet->length] = 0;
-                    printf("Received: %s\n",&buff[14]);
+                    
+                    telemetryPacket_t telem;
+                    unpackTelemetry(packet->data,&telem);
 
-                    csp_buffer_free(packet);
+                    switch(telem.telem_id){
+
+                        case PAYLOAD_ACK:{
+
+                            if(imageDownloadState == 1){
+
+                                uint32_t size = *((uint32_t*)&telem.data[0]);
+                                uint32_t numChunks = *((uint32_t*)&telem.data[sizeof(uint32_t)]);
+                                imageChunksLeft = numChunks;
+                                printf("Getting ready to receive image of %d bytes, in %d chunks.\n",size,numChunks);
+                                imageFileHandle = fopen(imageDownloadFile,"w");
+                            }
+                            break;
+                        }
+
+                        case PAYLOAD_FULL_IMAGE_ID:{
+
+                            uint8_t buff[256];
+                            imageChunksLeft --;
+                            memcpy(buff,&telem.data[4],telem.length-4); //Copy actual data
+                            fwrite(buff,1,telem.length-4,imageFileHandle);
+
+                            if(imageChunksLeft == 0 ){
+                                fclose(imageFileHandle);
+                                imageChunksLeft = 0;
+                                imageDownloadState =0;
+                                printf("Done receiving image");
+                            }
+                        }
+
+
+                    }
                     
                     break;
                 }
