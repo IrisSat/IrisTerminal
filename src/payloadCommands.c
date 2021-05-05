@@ -9,6 +9,7 @@
 #include <string.h>
 #include "csp_client.h"
 #include <csp/arch/csp_thread.h>
+#include "networkConfig.h"
 
 void sendImage(int argc, char **argv){
 
@@ -148,8 +149,34 @@ void downloadImage(int argc, char **argv){
 
     imageDownloadState = 1;
     snprintf(imageDownloadFile,100,"%s",argv[1]);
-    char * args[3] = {"scheduleTTT", "0","now"};
-    scheduleTTT(3,args);
+    if(argc == 2){
+        char * args[3] = {"scheduleTTT", "0","now"};
+        scheduleTTT(3,args);
+    }
+    else if (argc == 8){
+        Calendar_t when;
+        when.day= atoi(argv[2]);
+        when.hour = atoi(argv[3]);
+        when.minute = atoi(argv[4]);
+        when.month = atoi(argv[5]);
+        when.year = atoi(argv[6]);
+        when.weekday = 0; //This really isn't ever used and is just a pain, set to 0...
+        when.weekday =1; //Not used but must be 1.
+        scheduleTTT_raw(0,when);
+    }
+    else if(argc == 3){
+        Calendar_t cal;
+        int mins = atoi(argv[2]);
+        getCalendarNow(&cal);
+
+        if(mins +cal.minute > 59){
+            cal.hour = (cal.hour+1)%24;
+            cal.minute = mins-(60-cal.minute);
+        }
+        else{
+            cal.minute = cal.minute+mins;
+        }
+    }
 
 }
 

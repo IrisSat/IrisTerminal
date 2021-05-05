@@ -70,6 +70,26 @@ void scheduleTTT(int argc, char **argv){
 
     // int result = csp_send(conn,outPacket,1000);
 }
+
+
+void scheduleTTT_raw(int code,Calendar_t when){
+
+    telemetryPacket_t cmd;
+
+    cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+    cmd.length = sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+
+    uint8_t cmd_data[sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+    cmd.data = cmd_data;
+
+    cmd_data[0] = code;//First arg is the task code.
+    
+    memcpy(&cmd_data[1],&when,sizeof(Calendar_t));
+
+
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
 void cancelTTT(int argc,char **argv){}
 
 void setCdhTime(int argc, char **argv){
