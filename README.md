@@ -1,6 +1,7 @@
 # Iris Terminal
 
 This program is a command line utility for communicating with the Iris subsystems over a serial connection.
+The program can be used to download images from payload, or to schedule time tagged tasks, or to ping subsytems etc.
 
 The program uses the Cubesat Space Protocol to communicate with the subsystems. 
 
