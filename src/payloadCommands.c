@@ -149,9 +149,29 @@ void downloadImage(int argc, char **argv){
 
     imageDownloadState = 1;
     snprintf(imageDownloadFile,100,"%s",argv[1]);
-    if(argc == 2){
+    if(argc == 3){
         char * args[3] = {"scheduleTTT", "0","now"};
-        scheduleTTT(3,args);
+        // scheduleTTT(3,args);
+
+            Calendar_t now;
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    timeToCalendar(tm,&now);
+        
+    telemetryPacket_t cmd;
+
+    cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+    cmd.length = sizeof(uint8_t)*2+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+
+    uint8_t cmd_data[sizeof(uint8_t)*2+ sizeof(Calendar_t)] = {0};
+    cmd.data = cmd_data;
+
+    cmd_data[0] = 0;//First arg is the task code.
+    cmd_data[9] = atoi(argv[2]);
+    memcpy(&cmd_data[1],&now,sizeof(Calendar_t));
+
+
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
     }
     else if (argc == 8){
         Calendar_t when;

@@ -89,7 +89,7 @@ int running = 1;
                             imageChunksLeft --;
                             memcpy(buff,&telem.data[4],telem.length-4); //Copy actual data
                             fwrite(buff,1,telem.length-4,imageFileHandle);
-
+                            printf("chunks left:%d \n",imageChunksLeft);
                             if(imageChunksLeft == 0 ){
                                 fclose(imageFileHandle);
                                 imageChunksLeft = 0;
@@ -309,7 +309,7 @@ int startcsp(char * comPort,int baudRate){
     csp_debug_toggle_level(CSP_PACKET);
     csp_debug_toggle_level(CSP_INFO);
 
-    int res = csp_buffer_init(10, 300);
+    int res = csp_buffer_init(100, 300);
     if(res != CSP_ERR_NONE){
         printf("ERROR");
         return -1;
