@@ -75,7 +75,7 @@ int running = 1;
 
                                 if(imageFileHandle != NULL) fclose(imageFileHandle);
 
-                                imageFileHandle = fopen(imageDownloadFile,"w");
+                                imageFileHandle = fopen(imageDownloadFile,"wb");
                                 if(imageFileHandle == NULL){
                                     printf("Could not open file %s\n",imageDownloadFile);
                                 }
