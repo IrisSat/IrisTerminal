@@ -96,8 +96,29 @@ int running = 1;
                                 imageDownloadState =0;
                                 printf("Done receiving image.\n");
                             }
+                            break;
                         }
 
+                        case PAYLOAD_FILE_LIST_ID:{
+                            uint8_t buf[telem.length];
+                            snprintf(buf,telem.length,"%s",telem.data);
+                            printf("PAYLOAD_FILE_LIST_ID: %s\n",buf);
+                            break;
+                        }
+
+                        case PAYLOAD_ERROR_ID:{
+                            uint8_t errorMsg[telem.length];
+                            snprintf(errorMsg,telem.length,"%s",telem.data);
+                            printf("PAYLOAD_ERROR_ID: %s\n",errorMsg);
+                            break;
+                        }
+
+                        case PAYLOAD_META_ID:{
+                            uint8_t errorMsg[telem.length];
+                            snprintf(errorMsg,telem.length,"%s",telem.data);
+                            printf("PAYLOAD_META_ID: %s\n",errorMsg);
+                            break;
+                        }
 
                     }
                     

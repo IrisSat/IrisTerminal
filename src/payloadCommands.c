@@ -201,4 +201,198 @@ void downloadImage(int argc, char **argv){
 }
 
 void checkPayloadTelemetry(int argc,char **argv){}
-void requestPayloadTelemetry(int argc,char **argv){}
+void requestPayloadTelemetry(int argc,char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_POWER_GOOD_ID;
+
+    cmd.length = 0; //We send an updated time.
+telemetryPacket_t response;
+
+
+    int result = csp_transaction(2,PAYLOAD_CSP_ADDRESS,CSP_CMD_PORT,5000,&cmd,TELEM_HEADER_SIZE,&response,-1);
+    if(result<=0){
+        printf("csp transaction error: %d\n",result);
+    }
+    else{
+        //double* PowerGood=response.data;
+        //printf("Payload power good: %f\n",PowerGood);
+        printf("Payload power good: ???\n");
+       
+    
+
+    }
+    cmd.telem_id = PAYLOAD_BOARD_TEMP_ID;
+
+    cmd.length = 0; //We send an updated time.
+
+        result = csp_transaction(2,PAYLOAD_CSP_ADDRESS,CSP_CMD_PORT,5000,&cmd,TELEM_HEADER_SIZE,&response,-1);
+    if(result<=0){
+        printf("csp transaction error: %d\n",result);
+    }
+    else{
+        //double* boardtemp=response.data;
+        //printf("Payload board temperature: %d\n",boardtemp);
+        printf("Payload board temperature: ???\n");
+       
+    
+
+    }
+}
+
+//Added by Ali{
+
+void turnoncamera1(int argc, char **argv){ telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_CAM1_ON_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void turnoffcamera1(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_CAM1_OFF_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void turnoncamera2(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_CAM2_ON_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+void turnoffcamera2(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_CAM2_OFF_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void resetcamera1(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_CAM1_RESET_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void resetcamera2(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_CAM2_RESET_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void listofimages(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_FILE_LIST_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void takeimagecamera1(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_TAKE_IMAGE_CAM1_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+
+void takeimagecamera2(int argc, char **argv){telemetryPacket_t cmd;
+
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+
+    cmd.telem_id = PAYLOAD_TAKE_IMAGE_CAM2_CMD;
+
+    cmd.length = 0; //We send an updated time.
+sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+void pldFileList(int argc, char **argv){
+    
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = PAYLOAD_FILE_LIST_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+void deleteImage(int argc, char **argv){
+    
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = PAYLOAD_FILE_LIST_CMD;
+    cmd.length = 1; //We send an updated time.
+    cmd.data[0] = atoi(argv[1]);
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+
+

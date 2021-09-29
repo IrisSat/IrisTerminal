@@ -27,7 +27,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    19
+#define NUM_COMMANDS    30
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
@@ -45,9 +45,20 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"setCdhTime",setCdhTime,"Updates the time on CDH."},
     {"getCdhTime",getCdhTime,"Gets the time on CDH."},
     {"downloadImage",downloadImage,"Gets an image from payload."},
+    {"deleteImage",deleteImage,"Deletes a specified payload image."},
     {"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."},
     {"cancelTTT",cancelTTT,"Cancels a time tagged task."},
     {"quit",quitTerminal,"Exit the terminal."},
+    {"turnOnCamera1",turnoncamera1,"Turn on camera 1."},
+    {"turnOffCamera1",turnoffcamera1,"Turn off camera 1."},
+    {"turnOnCamera2",turnoncamera2,"Turn on camera 2."},
+    {"turnOffCamera2",turnoffcamera2,"Turn off camera 2."},
+    {"resetCamera1",resetcamera1,"Reset camera 1."},
+    {"resetCamera2",resetcamera2,"Reset camera 2."},
+    {"listofImages",listofimages,"List of images."},
+    {"icc1",takeimagecamera1,"Take image with camera 1."},
+    {"icc2",takeimagecamera2,"Take image with camera 2."},
+    {"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
 };
 
 int main(int argc, char **argv) {
