@@ -395,4 +395,28 @@ void deleteImage(int argc, char **argv){
     sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
 }
 
+void pldMountFS(int argc, char **argv){
+    
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = PAYLOAD_MOUNT_FS;
+    cmd.length = 1; //We send an updated time.
+    //cmd.data[0] = atoi(argv[1]);
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
 
+void pldUnmountFS(int argc, char **argv){
+    
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = PAYLOAD_UNMOUNT_FS;
+    cmd.length = 1; //We send an updated time.
+    //cmd.data[0] = atoi(argv[1]);
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}

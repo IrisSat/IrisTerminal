@@ -17,5 +17,7 @@ void takeimagecamera1(int argc, char **argv);
 void takeimagecamera2(int argc, char **argv);
 void pldFileList(int argc, char **argv);
 void deleteImage(int argc, char **argv);
+void pldMountFS(int argc, char **argv);
+void pldUnmountFS(int argc, char **argv);
 
 #endif
