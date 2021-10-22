@@ -153,25 +153,48 @@ void downloadImage(int argc, char **argv){
         char * args[3] = {"scheduleTTT", "0","now"};
         // scheduleTTT(3,args);
 
-            Calendar_t now;
-    time_t t = time(NULL);
-    struct tm *tm = localtime(&t);
-    timeToCalendar(tm,&now);
-        
-    telemetryPacket_t cmd;
+        Calendar_t now;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        timeToCalendar(tm,&now);
+            
+        telemetryPacket_t cmd;
 
-    cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
-    cmd.length = sizeof(uint8_t)*2+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        //We need to send the task code, and when to execute.
+        cmd.length = sizeof(uint8_t)*2+ sizeof(Calendar_t);
 
-    uint8_t cmd_data[sizeof(uint8_t)*2+ sizeof(Calendar_t)] = {0};
-    cmd.data = cmd_data;
+        uint8_t cmd_data[sizeof(uint8_t)*2+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
 
-    cmd_data[0] = 0;//First arg is the task code.
-    cmd_data[9] = atoi(argv[2]);
-    memcpy(&cmd_data[1],&now,sizeof(Calendar_t));
+        cmd_data[0] = 0;//First arg is the task code.
+        cmd_data[9] = atoi(argv[2]);
+        memcpy(&cmd_data[1],&now,sizeof(Calendar_t));
 
 
-    sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+    }
+    else if(argc == 4){
+        char * args[3] = {"scheduleTTT", "0","now"};
+        Calendar_t now;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        timeToCalendar(tm,&now);
+        telemetryPacket_t cmd;
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        //We need to send the task code, and when to execute.
+        cmd.length = sizeof(uint8_t)*3+ sizeof(Calendar_t);
+
+        uint8_t cmd_data[sizeof(uint8_t)*3+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+
+        cmd_data[0] = 0;//First arg is the task code.
+        cmd_data[9] = atoi(argv[2]);
+        cmd_data[10] = atoi(argv[3]);
+        memcpy(&cmd_data[1],&now,sizeof(Calendar_t));
+
+
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
     }
     else if (argc == 8){
         Calendar_t when;

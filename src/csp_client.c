@@ -120,6 +120,13 @@ int running = 1;
                             break;
                         }
 
+                        case PAYLOAD_MSG_ID:{
+                            uint8_t msg[telem.length];
+                            snprintf(msg,telem.length,"%s",telem.data);
+                            printf("PAYLOAD_MSG_ID: %s\n",msg);
+                            break;
+                        }
+
                     }
                     
                     break;
