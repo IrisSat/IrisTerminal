@@ -15,6 +15,12 @@
 /***********************************************************/
 //Put the commands/telemtry here.
 
+// Power telemetry.
+typedef enum{
+POW_READ_ADC_A_CMD = 0,
+POW_READ_ADC_B_CMD
+} powerCommands_t;
+
 //Payload telemetry.
 typedef enum {
 PAYLOAD_POWER_GOOD_ID = 0,
@@ -73,6 +79,7 @@ NUM_CDH_COMMANDS
 
 typedef enum {
 TASK_TAKE_IMAGE =0,
+TASK_READ_POW_ADC,
 NUM_CDH_TASK
 } cdhTask_t;
 

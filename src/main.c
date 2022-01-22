@@ -11,6 +11,11 @@
 
 #include "payloadCommands.h"
 #include "cdhCommands.h"
+#include "powerCommands.h"
+
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
 
 //Local Functions
 static void printHelp(int argc, char ** argv);
@@ -27,7 +32,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    32
+#define NUM_COMMANDS    33
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
@@ -61,6 +66,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
     {"pldMountFS",pldMountFS,"Mount the payload filesystem."},
     {"pldUnmountFS",pldUnmountFS,"Unmount the payload filesystem."},
+    {"powReadADC",powReadADC,"Read an ADC value from power."},
 };
 
 int main(int argc, char **argv) {
