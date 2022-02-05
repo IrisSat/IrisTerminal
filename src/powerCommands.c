@@ -11,6 +11,7 @@
 #include <csp/arch/csp_thread.h>
 #include "networkConfig.h"
 
+
 void powReadTemp(int argc, char **argv){
 
     if(argc == 2 || argc == 3){

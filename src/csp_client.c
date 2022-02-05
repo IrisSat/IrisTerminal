@@ -127,8 +127,18 @@ int running = 1;
                             break;
                         }
 
+                        case POWER_READ_TEMP_ID:{
+                            // Currently only processing four uint8_ts from power.
+                            float temp = (telem.data[3] << 24) | (telem.data[2] << 16) | (telem.data[1] << 8) | (telem.data[0]);
+                            printf("POWER_READ_TEMP_ID: %.3f\n",temp);
+                            for(int i=0; i < 4; i++){
+                                printf("[%d] - 0x%2X\n",i,telem.data[i]);
+                            }
+                            break;
+                        }
+
                     }
-                    
+                    printf("\nIris>");
                     break;
                 }
                 default:

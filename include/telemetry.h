@@ -18,10 +18,11 @@
 // Power Telemetry
 typedef enum
 {
-POWER_READ_TEMP_ID = 0,
+POWER_READ_TEMP_ID = 50,
 POWER_READ_SOLAR_CURRENT_ID,
 POWER_READ_LOAD_CURRENT_ID,
 POWER_READ_MSB_VOLTAGE_ID,
+POWER_MSG_ID
 } powerTelemetry_t;
 typedef enum
 {

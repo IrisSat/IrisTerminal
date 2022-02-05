@@ -32,7 +32,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    38
+#define NUM_COMMANDS    32
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
@@ -66,11 +66,11 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
     {"pldMountFS",pldMountFS,"Mount the payload filesystem."},
     {"pldUnmountFS",pldUnmountFS,"Unmount the payload filesystem."},
-    {"powReadTemp",powReadADC,"Power - Read a temperature value."},
-    {"powReadSC",powReadADC,"Power - Read a solar current value."},
-    {"powReadLC",powReadADC,"Power - Read a load current value."},
-    {"powReadMSBVoltage",powReadADC,"Power - Read MSB voltage value."},
-    {"powSetMode",powReadADC,"Power - Set power mode."},
+    // {"powReadTemp",powReadTemp,"Power - Read a temperature value."},
+    // {"powReadSC",powReadSolarCurrent,"Power - Read a solar current value."},
+    // {"powReadLC",powReadLoadCurrent,"Power - Read a load current value."},
+    // {"powReadMsbVoltage",powReadMSBVoltage,"Power - Read MSB voltage value."},
+    // {"powSetMode",powSetMode,"Power - Set power mode."},
 };
 
 
