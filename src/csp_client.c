@@ -128,12 +128,30 @@ int running = 1;
                         }
 
                         case POWER_READ_TEMP_ID:{
-                            // Currently only processing four uint8_ts from power.
-                            float temp = (telem.data[3] << 24) | (telem.data[2] << 16) | (telem.data[1] << 8) | (telem.data[0]);
+                            float temp;
+                            memcpy(&temp,telem.data,4);
                             printf("POWER_READ_TEMP_ID: %.3f\n",temp);
-                            for(int i=0; i < 4; i++){
-                                printf("[%d] - 0x%2X\n",i,telem.data[i]);
-                            }
+                            // for(int i=0; i < 4; i++){
+                            //     printf("[%d] - 0x%2X\n",i,telem.data[i]);
+                            // }
+                            break;
+                        }
+                        case POWER_READ_SOLAR_CURRENT_ID:{
+                            float temp;
+                            memcpy(&temp,telem.data,4);
+                            printf("POWER_READ_SOLAR_CURRENT_ID: %.3f\n",temp);
+                            break;
+                        }
+                        case POWER_READ_LOAD_CURRENT_ID:{
+                            float temp;
+                            memcpy(&temp,telem.data,4);
+                            printf("POWER_READ_LOAD_CURRENT_ID: %.3f\n",temp);
+                            break;
+                        }
+                        case POWER_READ_MSB_VOLTAGE_ID:{
+                            float temp;
+                            memcpy(&temp,telem.data,4);
+                            printf("POWER_READ_MSB_VOLTAGE_ID: %.3f\n",temp);
                             break;
                         }
 

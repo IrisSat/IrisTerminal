@@ -30,27 +30,28 @@ void scheduleTTT(int argc, char **argv){
     cmd.timestamp = now;
 
     cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
-    cmd.length = sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+    cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
 
-    uint8_t cmd_data[sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+    uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
     cmd.data = cmd_data;
 
-    cmd_data[0] = atoi(argv[1]);//First arg is the task code.
-    char * test = argv[2];
-    if(argc >3){
-        Calendar_t when={0};
-        when.day= atoi(argv[2]);
+    cmd_data[0] = atoi(argv[1]); //First arg is the task code.
+    cmd_data[1] = atoi(argv[2]); // Second arg is the task parameter.
+    // char * test = argv[2];
+    if(argc > 4){
+        Calendar_t when = {0};
+        when.day = atoi(argv[2]);
         when.hour = atoi(argv[3]);
         when.minute = atoi(argv[4]);
         when.month = atoi(argv[5]);
         when.year = atoi(argv[6]);
         when.weekday = 0; //This really isn't ever used and is just a pain, set to 0...
-        when.weekday =1; //Not used but must be 1.
+        when.weekday = 1; //Not used but must be 1.
         
         memcpy(&cmd_data[1],&when,sizeof(Calendar_t));
     }
-    else if(strcmp(argv[2],"now")==0){
-        memcpy(&cmd_data[1],&now,sizeof(Calendar_t)); //Just copy the current time.
+    else if(strcmp(argv[3],"now")==0){
+        memcpy(&cmd_data[2],&now,sizeof(Calendar_t)); //Just copy the current time.
     }
     else{
         printf("Wrong number of args... try scheduleTTT help for instructions on how to use this function.\n");

@@ -88,9 +88,16 @@ CDH_DOWNLOAD_IMAGE_CMD,
 NUM_CDH_COMMANDS
 } cdhCommands_t;
 typedef enum {
-TASK_TAKE_IMAGE =0,
-TASK_READ_POW_ADC,
-NUM_CDH_TASK
+// Payload tasks
+TASK_TAKE_IMAGE = 0,
+// Power tasks,
+TASK_POWER_READ_TEMP,
+TASK_POWER_READ_SOLAR_CURRENT,
+TASK_POWER_READ_LOAD_CURRENT,
+TASK_POWER_READ_MSB_VOLTAGE,
+TASK_POWER_SET_MODE,
+// Total number of tasks
+NUM_CDH_TASKS
 } cdhTask_t;
 
 /**********************************************************/

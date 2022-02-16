@@ -14,22 +14,26 @@
 
 void powReadTemp(int argc, char **argv){
 
-    if(argc == 2 || argc == 3){
-        // Check the bounds of num
-        int num = atoi(argv[2]);
-
-        // Create timestamp for time tagged task (we'll just schedule them right away/now)
+    if(argc == 2){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
         Calendar_t now;
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
         timeToCalendar(tm,&now);
-        // Create telemetry packet
-        telemetryPacket_t cmd;
-        cmd.telem_id = POWER_READ_TEMP_CMD;
         cmd.timestamp = now;
-        cmd.length = 1;
-        cmd.data[0] = num;
-        sendCommand(&cmd,POWER_CSP_ADDRESS);
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_READ_TEMP; //First arg is the task code.
+        cmd_data[1] = atoi(argv[2]); // Second arg is the task parameter.
+        // Send the TTT
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
     } else {
         printf("Invalid command.\n");
     }
@@ -38,22 +42,26 @@ void powReadTemp(int argc, char **argv){
 
 void powReadSolarCurrent(int argc, char **argv){
 
-    if(argc == 2 || argc == 3){
-        // Check the bounds of num
-        int num = atoi(argv[2]);
-
-        // Create timestamp for time tagged task (we'll just schedule them right away/now)
+    if(argc == 2){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
         Calendar_t now;
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
         timeToCalendar(tm,&now);
-        // Create telemetry packet
-        telemetryPacket_t cmd;
-        cmd.telem_id = POWER_READ_SOLAR_CURRENT_CMD;
         cmd.timestamp = now;
-        cmd.length = 1;
-        cmd.data[0] = num;
-        sendCommand(&cmd,POWER_CSP_ADDRESS);
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_READ_SOLAR_CURRENT; //First arg is the task code.
+        cmd_data[1] = atoi(argv[2]); // Second arg is the task parameter.
+        // Send the TTT
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
     } else {
         printf("Invalid command.\n");
     }
@@ -61,22 +69,26 @@ void powReadSolarCurrent(int argc, char **argv){
 }
 void powReadLoadCurrent(int argc, char **argv){
 
-    if(argc == 2 || argc == 3){
-        // Check the bounds of num
-        int num = atoi(argv[2]);
-
-        // Create timestamp for time tagged task (we'll just schedule them right away/now)
+    if(argc == 2){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
         Calendar_t now;
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
         timeToCalendar(tm,&now);
-        // Create telemetry packet
-        telemetryPacket_t cmd;
-        cmd.telem_id = POWER_READ_LOAD_CURRENT_CMD;
         cmd.timestamp = now;
-        cmd.length = 1;
-        cmd.data[0] = num;
-        sendCommand(&cmd,POWER_CSP_ADDRESS);
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_READ_LOAD_CURRENT; //First arg is the task code.
+        cmd_data[1] = atoi(argv[2]); // Second arg is the task parameter.
+        // Send the TTT
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
     } else {
         printf("Invalid command.\n");
     }
@@ -84,22 +96,26 @@ void powReadLoadCurrent(int argc, char **argv){
 }
 void powReadMSBVoltage(int argc, char **argv){
 
-    if(argc == 2 || argc == 3){
-        // Check the bounds of num
-        int num = atoi(argv[2]);
-
-        // Create timestamp for time tagged task (we'll just schedule them right away/now)
+    if(argc == 2){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
         Calendar_t now;
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
         timeToCalendar(tm,&now);
-        // Create telemetry packet
-        telemetryPacket_t cmd;
-        cmd.telem_id = POWER_READ_MSB_VOLTAGE_CMD;
         cmd.timestamp = now;
-        cmd.length = 1;
-        cmd.data[0] = num;
-        sendCommand(&cmd,POWER_CSP_ADDRESS);
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_READ_MSB_VOLTAGE; //First arg is the task code.
+        cmd_data[1] = 0; // Task doesn't require a parameter
+        // Send the TTT
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
     } else {
         printf("Invalid command.\n");
     }
@@ -107,22 +123,26 @@ void powReadMSBVoltage(int argc, char **argv){
 }
 void powSetMode(int argc, char **argv){
 
-    if(argc == 2 || argc == 3){
-        // Check the bounds of num
-        int num = atoi(argv[2]);
-
-        // Create timestamp for time tagged task (we'll just schedule them right away/now)
+    if(argc == 2){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
         Calendar_t now;
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
         timeToCalendar(tm,&now);
-        // Create telemetry packet
-        telemetryPacket_t cmd;
-        cmd.telem_id = POWER_SET_POW_MODE_CMD;
         cmd.timestamp = now;
-        cmd.length = 1;
-        cmd.data[0] = num;
-        sendCommand(&cmd,POWER_CSP_ADDRESS);
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_SET_MODE; //First arg is the task code.
+        cmd_data[1] = 0; // Task doesn't require a parameter
+        // Send the TTT
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
     } else {
         printf("Invalid command.\n");
     }
