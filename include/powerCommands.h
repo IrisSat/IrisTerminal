@@ -5,7 +5,9 @@
 void powReadTemp(int argc, char **argv);
 void powReadSolarCurrent(int argc, char **argv);
 void powReadLoadCurrent(int argc, char **argv);
-void powReadMSBVoltage(int argc, char **argv);
+void powReadMsbVoltage(int argc, char **argv);
+void powSetLoad(int argc, char **argv);
+void powSetSolar(int argc, char **argv);
 void powSetMode(int argc, char **argv);
 
 #endif
