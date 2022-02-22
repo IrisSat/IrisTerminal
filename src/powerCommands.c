@@ -63,7 +63,7 @@ void powReadSolarCurrent(int argc, char **argv){
         uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
         cmd.data = cmd_data;
         cmd_data[0] = TASK_POWER_READ_SOLAR_CURRENT; //First arg is the task code.
-        cmd_data[1] = atoi(argv[2]); // Second arg is the task parameter.
+        cmd_data[1] = atoi(argv[1]); // Second arg is the task parameter.
         if(cmd.data[1] < 0 || cmd.data[1] > 6)
         {
             printf("Read POW solar current argument out of range.");
@@ -95,7 +95,7 @@ void powReadLoadCurrent(int argc, char **argv){
         uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
         cmd.data = cmd_data;
         cmd_data[0] = TASK_POWER_READ_LOAD_CURRENT; //First arg is the task code.
-        cmd_data[1] = atoi(argv[2]); // Second arg is the task parameter.
+        cmd_data[1] = atoi(argv[1]); // Second arg is the task parameter.
         if(cmd.data[1] < 0 || cmd.data[1] > 6)
         {
             printf("Read POW load current argument out of range.");
@@ -155,11 +155,11 @@ void powSetLoad(int argc, char **argv)
         // Format Data
         uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
         cmd.data = cmd_data;
-        if(strcmp(argv[2],"on"))
+        if(strcmp(argv[2],"on") == 0)
         {
             cmd_data[0] = TASK_POWER_SET_LOAD_ON; //First arg is the task code.
         }
-        else if(strcmp(argv[2],"off"))
+        else if(strcmp(argv[2],"off") == 0)
         {
             cmd_data[0] = TASK_POWER_SET_LOAD_OFF;
         }
@@ -199,11 +199,11 @@ void powSetSolar(int argc, char **argv)
         // Format Data
         uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
         cmd.data = cmd_data;
-        if(strcmp(argv[2],"on"))
+        if(strcmp(argv[2],"on") == 0)
         {
             cmd_data[0] = TASK_POWER_SET_SOLAR_ON; //First arg is the task code.
         }
-        else if(strcmp(argv[2],"off"))
+        else if(strcmp(argv[2],"off") == 0)
         {
             cmd_data[0] = TASK_POWER_SET_SOLAR_OFF;
         }
