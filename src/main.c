@@ -66,12 +66,12 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
     {"pldMountFS",pldMountFS,"Mount the payload filesystem."},
     {"pldUnmountFS",pldUnmountFS,"Unmount the payload filesystem."},
-    {"powReadTemp",powReadTemp,"Power - Read a temperature value."},
+    {"powReadTemp",powReadTempChannel,"Power - Read a temperature channel."},
     {"powReadSC",powReadSolarCurrent,"Power - Read a solar current value."},
     {"powReadLC",powReadLoadCurrent,"Power - Read a load current value."},
     {"powReadMsbVoltage",powReadMsbVoltage,"Power - Read MSB voltage value."},
-    {"powSetLoad",powSetLoad,"Power - Set load switch on/off (choose 0-6)."},
-    {"powSetSolar",powSetSolar,"Power - Set solar array switch on/off (choose 0-6)."},
+    {"powSetLoadSwitch",powSetLoadSwitch,"Power - Set load switch on/off."},
+    {"powSetSolar",powSetSolar,"Power - Set solar array switch on/off."},
     {"powSetMode",powSetMode,"Power - Set power mode."},
 };
 
@@ -221,3 +221,4 @@ char * getline_(void) {
     *line = '\0';
     return linep;
 }
+
