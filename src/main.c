@@ -8,6 +8,7 @@
 #include "csp_client.h"
 
 #include "main.h"
+#include "commsCommands.h"
 #include "settingsUtilities.h"
 #include "payloadCommands.h"
 #include "cdhCommands.h"
@@ -32,7 +33,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    39
+#define NUM_COMMANDS    40
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
@@ -73,6 +74,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"powSetLoadSwitch",powSetLoadSwitch,"Power - Set load switch on/off."},
     {"powSetSolar",powSetSolar,"Power - Set solar array switch on/off."},
     {"powSetMode",powSetMode,"Power - Set power mode."},
+    {"sendCommsMessage",commsSendCSPMessage,"Send COMMS a message."},
 };
 
 

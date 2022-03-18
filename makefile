@@ -22,8 +22,8 @@ LIBS = -lcsp -lserialport -lsetupapi
 # clean:
 # 	rm -f $(BUILDDIR)/*o $(BUILDDIR)/$(EXECUTABLE)
 
-all: src/main.c src/drivers/usart_windows2.c src/csp_client.c src/payloadCommands.c src/powerCommands.c src/networkConfig.c src/cdhCommands.c src/telemetry.c src/utilities/loggingUtilities.c src/utilities/settingsUtilities.c src/utilities/utilities.c
-	$(CC) $(FLAGS) -o IrisTerminal src/main.c src/drivers/usart_windows2.c src/csp_client.c src/payloadCommands.c src/powerCommands.c src/networkConfig.c src/cdhCommands.c src/telemetry.c src/utilities/loggingUtilities.c src/utilities/settingsUtilities.c src/utilities/utilities.c $(INC) $(LIBDIR) $(LIBS) 
+all: src/main.c src/drivers/usart_windows2.c src/csp_client.c src/payloadCommands.c src/powerCommands.c src/networkConfig.c src/cdhCommands.c src/telemetry.c src/utilities/loggingUtilities.c src/utilities/settingsUtilities.c src/utilities/utilities.c src/commsCommands.c
+	$(CC) $(FLAGS) -o IrisTerminal src/main.c src/drivers/usart_windows2.c src/csp_client.c src/payloadCommands.c src/powerCommands.c src/networkConfig.c src/cdhCommands.c src/telemetry.c src/utilities/loggingUtilities.c src/utilities/settingsUtilities.c src/utilities/utilities.c src/commsCommands.c $(INC) $(LIBDIR) $(LIBS) 
 
 clean:
 	rm *.exe

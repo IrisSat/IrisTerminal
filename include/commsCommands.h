@@ -1,0 +1,1 @@
+void commsSendCSPMessage(int argc, char **argv);
