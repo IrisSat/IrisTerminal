@@ -1,0 +1,4 @@
+COMPORT=COM6
+BAUDRATE=115200
+LOGFILE=/logfiles/log.txt
+INPUTFILE=/inputfiles/powertesting.txt

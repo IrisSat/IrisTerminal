@@ -3,12 +3,12 @@
  * 
  */
 
-#include <stdio.h>
 #include <csp/csp.h>
 #include <csp/arch/csp_thread.h>
 #include "csp_client.h"
-#include <unistd.h>
 
+#include "main.h"
+#include "settingsUtilities.h"
 #include "payloadCommands.h"
 #include "cdhCommands.h"
 #include "powerCommands.h"
@@ -89,10 +89,17 @@ int main(int argc, char **argv) {
     printf("Current directory: %s\n",cwd);
 
     //User must specify 2 parameters(COM port and baud rate), so argc == 3
-    if(argc !=3){
+    if(argc == 1)
+    {
+        InitializeSettings();
         return 0;
     }
-    else{
+    if(argc != 3)
+    {
+        return 0;
+    }
+    else
+    {
         startcsp(argv[1],atoi(argv[2]));
     }
     while(1) {

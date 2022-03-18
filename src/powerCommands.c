@@ -72,13 +72,13 @@ void powReadTempChannel(int argc, char **argv){
         cmd_data[1] = atoi(argv[1]); // Second arg is the task parameter.
         if(cmd.data[1] < 0 || cmd.data[1] > 6)
         {
-            printf("Read POW temperature argument out of range.\n");
+            printf("Invalid read POW temperature argument.\n");
             printf("Enter the following command for valid modes: powReadTemp --help\n");
             return;
         }
         // Send the TTT
         printf("Reading temperature channel %d\n",cmd_data[1]);
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        // sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - 1 required).\n");
@@ -114,13 +114,13 @@ void powReadSolarCurrent(int argc, char **argv){
         cmd_data[1] = atoi(argv[1]); // Second arg is the task parameter.
         if(cmd.data[1] < 0 || cmd.data[1] > 6)
         {
-            printf("Read POW solar current argument out of range.\n");
+            printf("Invalid read power solar current arguments.\n");
             printf("Enter the following command for valid modes: powReadSC --help\n");
             return;
         }
         // Send the TTT
         printf("Reading solar current %d\n",cmd_data[1]);
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - 1 required).\n");
@@ -159,13 +159,13 @@ void powReadLoadCurrent(int argc, char **argv){
         cmd_data[1] = loadCurentChannel; // Second arg is the task parameter.
         if(cmd.data[1] < 0 || cmd.data[1] > 6)
         {
-            printf("Invalid load current channel.\n");
+            printf("Invalid load current arguments.\n");
             printf("Enter the following command for valid modes: powReadLC --help\n");
             return;
         }
         // Send the TTT
         printf("Reading load current %s\n",LoadCurrentChannelStrings[loadCurentChannel]);
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - 1 required).\n");
@@ -179,6 +179,9 @@ void powReadMsbVoltage(int argc, char **argv){
             printf("powReadMsbVoltage help:\n");
             printf("-Command format: powSetLoadSwitch\n");
             printf("-No arguments required:\n");
+        } else {
+            printf("Invalid command (improper number of arguments - none required).\n");
+            printf("Enter the following command for valid modes: powReadMsbVoltage --help\n");
         }
     }
     else if(argc == 1){
@@ -200,7 +203,7 @@ void powReadMsbVoltage(int argc, char **argv){
         cmd_data[1] = 0; // Task doesn't require a parameter
         // Send the TTT
         printf("Getting MSB voltage\n");
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - none required).\n");
@@ -220,6 +223,10 @@ void powSetLoadSwitch(int argc, char **argv)
             int i;
             for(i=0; i < NUM_LOAD_SWITCHES; i++)
                 printf(" - %s\n",LoadSwitchStrings[i]);
+        } else {
+            printf("Improper command argument.\n");
+            printf("Enter the following command for valid modes: powSetLoadSwitch --help\n");
+            return;
         }
     }
     else if(argc == 3){
@@ -254,18 +261,18 @@ void powSetLoadSwitch(int argc, char **argv)
         // Set the load switch number, check bounds
         uint8_t loadSwitchNum = decodeLoadSwitchNumber(argv[1]);
         cmd_data[1] = loadSwitchNum;
-        if(cmd.data[1] < 0 || cmd.data[1] > 6)
+        if(loadSwitchNum < 0 || loadSwitchNum > 6)
         {
-            printf("Invalid power load switch argument - 2 required.\n");
+            printf("Invalid power load switch arguments.\n");
             printf("Enter the following command for valid modes: powSetLoadSwitch --help\n");
             return;
         }
         // Send the TTT
         printf("Setting power load switch %s %s\n",LoadSwitchStrings[loadSwitchNum],argv[2]);
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
-        printf("Invalid command (improper number of arguments).\n");
+        printf("Invalid command (improper number of arguments - 2 required).\n");
         printf("Enter the following command for valid modes: powSetLoadSwitch --help\n");
     }
 }
@@ -276,6 +283,9 @@ void powSetSolar(int argc, char **argv)
             printf("powSetSolar help:\n");
             printf("-Command format: powSetSolar [arg] [on|off]\n");
             printf("-Possible arguments: 0-6\n");
+        } else {
+            printf("Invalid command (improper number of arguments - 2 required).\n");
+            printf("Enter the following command for valid modes: powSetSolar --help\n");
         }
     }
     else if(argc == 3){
@@ -303,7 +313,7 @@ void powSetSolar(int argc, char **argv)
         }
         else
         {
-            printf("Improper command argument (on/off).\n");
+            printf("Invalid set power solar switch arguments.\n");
             printf("Enter the following command for valid modes: powSetSolar --help\n");
             return;
         }
@@ -311,13 +321,13 @@ void powSetSolar(int argc, char **argv)
         cmd_data[1] = atoi(argv[1]);
         if(cmd.data[1] < 0 || cmd.data[1] > 6)
         {
-            printf("Set POW solar switch argument out of range.\n");
+            printf("Invalid set power solar switch arguments.\n");
             printf("Enter the following command for valid modes: powSetSolar --help\n");
             return;
         }
         // Send the TTT
         printf("Setting power solar array %d %s\n",cmd_data[1],argv[2]);
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - 2 required).\n");
@@ -362,7 +372,7 @@ void powSetMode(int argc, char **argv){
         cmd_data[1] = powerMode;
         // Send the TTT
         printf("Setting power mode: %s\n",PowerModeStrings[powerMode]);
-        //sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - 1 required).");

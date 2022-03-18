@@ -1,0 +1,4 @@
+#ifndef LOGGING_UTLITIES_H_
+#define LOGGING_UTLITIES_H_
+
+#endif

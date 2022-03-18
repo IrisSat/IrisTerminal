@@ -16,6 +16,7 @@
         "cdhcommands.h": "c",
         "telemetry.h": "c",
         "stdint.h": "c",
-        "payloadcommands.h": "c"
+        "payloadcommands.h": "c",
+        "csp_if_can.h": "c"
     }
 }

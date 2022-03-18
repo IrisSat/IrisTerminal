@@ -185,13 +185,14 @@ void downloadImage(int argc, char **argv){
         //We need to send the task code, and when to execute.
         cmd.length = sizeof(uint8_t)*3+ sizeof(Calendar_t);
 
-        uint8_t cmd_data[sizeof(uint8_t)*3+ sizeof(Calendar_t)] = {0};
+        uint8_t cmd_data[sizeof(uint8_t)*2+ sizeof(Calendar_t)] = {0};
         cmd.data = cmd_data;
 
         cmd_data[0] = 0;//First arg is the task code.
-        cmd_data[9] = atoi(argv[2]);
-        cmd_data[10] = atoi(argv[3]);
-        memcpy(&cmd_data[1],&now,sizeof(Calendar_t));
+        cmd_data[1] = atoi(argv[2]);
+        // cmd_data[9] = atoi(argv[2]);
+        // cmd_data[10] = atoi(argv[3]);
+        memcpy(&cmd_data[2],&now,sizeof(Calendar_t));
 
 
         sendCommand(&cmd,CDH_CSP_ADDRESS);
