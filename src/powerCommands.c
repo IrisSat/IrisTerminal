@@ -78,7 +78,7 @@ void powReadTempChannel(int argc, char **argv){
         }
         // Send the TTT
         printf("Reading temperature channel %d\n",cmd_data[1]);
-        // sendCommand(&cmd,CDH_CSP_ADDRESS);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
 
     } else {
         printf("Invalid command (improper number of arguments - 1 required).\n");

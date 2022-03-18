@@ -270,7 +270,9 @@ telemetryPacket_t response;
 
 //Added by Ali{
 
-void turnoncamera1(int argc, char **argv){ telemetryPacket_t cmd;
+void turnoncamera1(int argc, char **argv){ 
+    
+    telemetryPacket_t cmd;
 
     //Set command timestamp to now.
     Calendar_t now;
