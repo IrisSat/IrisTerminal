@@ -12,7 +12,7 @@
 #include "networkConfig.h"
 #include "telemetry.h"
 #include <time.h>
-
+#include "commands.h"
 
 void getCdhTelemetry(int argc, char **argv){}
 void checkCdhTelemetry(int argc, char **argv){}
@@ -54,7 +54,7 @@ void scheduleTTT(int argc, char **argv){
         memcpy(&cmd_data[2],&now,sizeof(Calendar_t)); //Just copy the current time.
     }
     else{
-        printf("Wrong number of args... try scheduleTTT help for instructions on how to use this function.\n");
+        printfToOutput("Wrong number of args... try scheduleTTT help for instructions on how to use this function.\n");
         return;
     }
 
@@ -96,13 +96,13 @@ void cancelTTT(int argc,char **argv){}
 void setCdhTime(int argc, char **argv){
 
     if(strcmp(argv[1],"help") ==0){
-        printf("This command can be used to set the time on CDH. \n");
-        printf("Should only be needed for testing or inital setup, since the external RTC can keep time with battery.\n");
-        printf("Usage: setCdhTime now\n");
-        printf("Usage: setCdhTime <s> <min> <hr> <day> <month> <year>\n");
-        printf("Time Format: 24 hour, month 1-12, year since 2000\n");
-        printf("Example: So to set the time to June 4 2021 at 6:30:00 pm\n");
-        printf("\t setCdhTime 0 30 18 1 6 21");
+        printfToOutput("This command can be used to set the time on CDH. \n");
+        printfToOutput("Should only be needed for testing or inital setup, since the external RTC can keep time with battery.\n");
+        printfToOutput("Usage: setCdhTime now\n");
+        printfToOutput("Usage: setCdhTime <s> <min> <hr> <day> <month> <year>\n");
+        printfToOutput("Time Format: 24 hour, month 1-12, year since 2000\n");
+        printfToOutput("Example: So to set the time to June 4 2021 at 6:30:00 pm\n");
+        printfToOutput("\t setCdhTime 0 30 18 1 6 21");
 
         return;
     }
@@ -138,7 +138,7 @@ void setCdhTime(int argc, char **argv){
         memcpy(cmd_data,&now,sizeof(Calendar_t)); //Just copy the current time.
     }
     else{
-        printf("Wrong number of args... try setCdhTime help for instructions on how to use this function.\n");
+        printfToOutput("Wrong number of args... try setCdhTime help for instructions on how to use this function.\n");
         return;
     }
 
@@ -160,7 +160,7 @@ void getCdhTime(int argc, char **argv){
 
     int result = csp_transaction(2,CDH_CSP_ADDRESS,CSP_CMD_PORT,5000,&request,TELEM_HEADER_SIZE,&response,TELEM_HEADER_SIZE);
     if(result<=0){
-        printf("csp transaction error: %d\n",result);
+        printfToOutput("csp transaction error: %d\n",result);
     }
     else{
         printCalendar(&response.timestamp);

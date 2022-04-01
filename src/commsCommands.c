@@ -9,6 +9,7 @@
 #include "csp_client.h"
 #include <csp/arch/csp_thread.h>
 #include "networkConfig.h"
+#include "commands.h"
 
 void commsSendCSPMessage(int argc, char **argv){
 
@@ -19,11 +20,11 @@ void commsSendCSPMessage(int argc, char **argv){
         cmd.data = cmd_data;
         cmd_data[0] = 0xAA;
         cmd_data[1] = 0xAA;
-        printf("sending COMMS message\n");
+        printfToOutput("sending COMMS message\n");
         sendCommand(&cmd,COMMS_CSP_ADDRESS);
 
     } else {
-        printf("Invalid command (improper number of arguments - 1 required).\n");
+        printfToOutput("Invalid command (improper number of arguments - 1 required).\n");
     }
 
 }

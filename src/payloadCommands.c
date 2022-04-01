@@ -10,23 +10,24 @@
 #include "csp_client.h"
 #include <csp/arch/csp_thread.h>
 #include "networkConfig.h"
+#include "commands.h"
 
 void sendImage(int argc, char **argv){
 
     
     if(argc != 2){
-        printf("incorrect parameteres...");
+        printfToOutput("incorrect parameteres...");
     }
     else{
 
-    printf("Sending image to the payload board...\n");
+    printfToOutput("Sending image to the payload board...\n");
 
     const int chunkSize = 64;
     char* fileName =argv[1];
     FILE * imgFile;
     imgFile = fopen(fileName,"rb");
     if(imgFile == NULL){
-        printf("Error opneing file %s\n",argv);
+        printfToOutput("Error opneing file %s\n",argv);
         goto END;
     }
 
@@ -37,13 +38,13 @@ void sendImage(int argc, char **argv){
     double numChunks_dec = fileSize_B/chunkSize;
     int numChunks = (int)ceil(numChunks_dec);
 
-    printf("Splitting the image(%dkiB) into %d chunks of size %d B.\n",fileSize_B/1024,numChunks,chunkSize);
+    printfToOutput("Splitting the image(%dkiB) into %d chunks of size %d B.\n",fileSize_B/1024,numChunks,chunkSize);
     // proceed with allocating memory and reading the file
 
     uint8_t* chunk;
     chunk = malloc(chunkSize);
     if(chunk == NULL){
-        printf("Error allocating memory... Download some more RAM!\n");
+        printfToOutput("Error allocating memory... Download some more RAM!\n");
     }
     //Send file...
     for(uint16_t i=0; i<numChunks;i++){
@@ -63,7 +64,7 @@ void sendImage(int argc, char **argv){
 
         int result = csp_transaction(2,5,7,5000,telemPacket,12+chunkSize,resp,12);
         if(result<=0){
-            printf("csp transaction error: %d\n",result);
+            printfToOutput("csp transaction error: %d\n",result);
             break;
         }
         
@@ -73,7 +74,7 @@ void sendImage(int argc, char **argv){
 			// conn = csp_connect(2,5,7,1000,0);	//Create a connection. This tells CSP where to send the data (address and destination port).
             // if (conn == NULL){
 
-            //     printf("Error with connection\n;");
+            //     printfToOutput("Error with connection\n;");
             //     goto END;
             // }
 		       
@@ -83,7 +84,7 @@ void sendImage(int argc, char **argv){
             // outPacket->length = chunkSize +12;
 
             // int good = csp_send(conn,outPacket,0);
-            // printf("csp_send: %d\n",good);
+            // printfToOutput("csp_send: %d\n",good);
 			// csp_close(conn);
 
 			// if(!good){
@@ -112,31 +113,31 @@ void sendImage(int argc, char **argv){
 
 
         if(*((uint16_t*)&resp[10]) != (numChunks-1-i) || resp[8] != 11){
-            printf("Error on packet %d stopping...\n",i);
+            printfToOutput("Error on packet %d stopping...\n",i);
             goto END;
         }
 
         if(i %(numChunks/100) == 0){
-            printf("Progress: %f \% \n",((double)i)/numChunks*100);
+            printfToOutput("Progress: %f \% \n",((double)i)/numChunks*100);
         }
         // csp_sleep_ms(10);
-        printf("chunk num: %d\n",i);
+        printfToOutput("chunk num: %d\n",i);
     }
 
     fclose(imgFile);
     }
     END:
-        printf("error\n");
+        printfToOutput("error\n");
 }
 
 void getPayloadTelemetry(int argc,char **argv){
 
     if(strcmp(argv[1],"help") ==0){
-        printf("This command can be used to get recent telemtry from payload that is stored on CDH.\n");
-        printf("Usage: getPldTelem <item> <num>\n");
-        printf("\t <item>: The telemetry data you want: \n");
-        printf("\t\t pwrGood\n\t\t boardTemp\n\t\t sampleTemp\n\t\t sampleLoc\n\t\t error\n");
-        printf("\t <num>: The max number of items to get. Starting with the newest value.");
+        printfToOutput("This command can be used to get recent telemtry from payload that is stored on CDH.\n");
+        printfToOutput("Usage: getPldTelem <item> <num>\n");
+        printfToOutput("\t <item>: The telemetry data you want: \n");
+        printfToOutput("\t\t pwrGood\n\t\t boardTemp\n\t\t sampleTemp\n\t\t sampleLoc\n\t\t error\n");
+        printfToOutput("\t <num>: The max number of items to get. Starting with the newest value.");
     }
     
     else if(strcmp(argv[1],"pwrGood") ==0){
@@ -148,7 +149,7 @@ void getPayloadTelemetry(int argc,char **argv){
 void downloadImage(int argc, char **argv){
 
     imageDownloadState = 1;
-    snprintf(imageDownloadFile,100,"%s",argv[1]);
+    snprintfToOutput(imageDownloadFile,100,"%s",argv[1]);
     if(argc == 3){
         char * args[3] = {"scheduleTTT", "0","now"};
         // scheduleTTT(3,args);
@@ -240,12 +241,12 @@ telemetryPacket_t response;
 
     int result = csp_transaction(2,PAYLOAD_CSP_ADDRESS,CSP_CMD_PORT,5000,&cmd,TELEM_HEADER_SIZE,&response,-1);
     if(result<=0){
-        printf("csp transaction error: %d\n",result);
+        printfToOutput("csp transaction error: %d\n",result);
     }
     else{
         //double* PowerGood=response.data;
-        //printf("Payload power good: %f\n",PowerGood);
-        printf("Payload power good: ???\n");
+        //printfToOutput("Payload power good: %f\n",PowerGood);
+        printfToOutput("Payload power good: ???\n");
        
     
 
@@ -256,12 +257,12 @@ telemetryPacket_t response;
 
         result = csp_transaction(2,PAYLOAD_CSP_ADDRESS,CSP_CMD_PORT,5000,&cmd,TELEM_HEADER_SIZE,&response,-1);
     if(result<=0){
-        printf("csp transaction error: %d\n",result);
+        printfToOutput("csp transaction error: %d\n",result);
     }
     else{
         //double* boardtemp=response.data;
-        //printf("Payload board temperature: %d\n",boardtemp);
-        printf("Payload board temperature: ???\n");
+        //printfToOutput("Payload board temperature: %d\n",boardtemp);
+        printfToOutput("Payload board temperature: ???\n");
        
     
 
