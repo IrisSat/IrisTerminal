@@ -16,16 +16,12 @@ void pldBootCount(int argc, char **argv){
 
 }
 
-void sendImage(int argc, char **argv){
-
-    
+void pldSendImage(int argc, char **argv){
     if(argc != 2){
         printf("incorrect parameteres...");
     }
     else{
-
     printf("Sending image to the payload board...\n");
-
     const int chunkSize = 64;
     char* fileName =argv[1];
     FILE * imgFile;
@@ -52,8 +48,6 @@ void sendImage(int argc, char **argv){
     }
     //Send file...
     for(uint16_t i=0; i<numChunks;i++){
-        
-
 
         fread(chunk,1,chunkSize,imgFile);
 
@@ -134,7 +128,7 @@ void sendImage(int argc, char **argv){
         printf("error\n");
 }
 
-void getPayloadTelemetry(int argc,char **argv){
+void pldGetTelemetry(int argc,char **argv){
 
     if(strcmp(argv[1],"help") ==0){
         printf("This command can be used to get recent telemtry from payload that is stored on CDH.\n");
@@ -229,7 +223,7 @@ void downloadImage(int argc, char **argv){
 
 }
 
-void checkPayloadTelemetry(int argc,char **argv){}
+void pldCheckTelemetry(int argc,char **argv){}
 void requestPayloadTelemetry(int argc,char **argv){telemetryPacket_t cmd;
 
     //Set command timestamp to now.

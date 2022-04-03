@@ -28,9 +28,9 @@ const char * LogFileList[] =
     "cdhError"
 };
 
-void getCdhTelemetry(int argc, char **argv){}
-void checkCdhTelemetry(int argc, char **argv){}
-void requestCdhTelemetry(int argc, char **argv){}
+void cdhGetTelemetry(int argc, char **argv){}
+void cdhCheckTelemetry(int argc, char **argv){}
+void cdhRequestTelemetry(int argc, char **argv){}
 
 uint8_t decodeLogFileNames(char * arg)
 {
@@ -153,7 +153,7 @@ void scheduleTTT_raw(int code,Calendar_t when){
 
 void cancelTTT(int argc,char **argv){}
 
-void setCdhTime(int argc, char **argv){
+void cdhSetTime(int argc, char **argv){
 
     if(strcmp(argv[1],"help") ==0){
         printf("This command can be used to set the time on CDH. \n");
@@ -205,7 +205,7 @@ void setCdhTime(int argc, char **argv){
     sendCommand(&cmd,CDH_CSP_ADDRESS);
 }
 
-void getCdhTime(int argc, char **argv){
+void cdhGetTime(int argc, char **argv){
 
     telemetryPacket_t request;
 
