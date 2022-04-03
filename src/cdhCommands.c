@@ -13,10 +13,70 @@
 #include "telemetry.h"
 #include <time.h>
 
+typedef enum
+{
+    TASK_LOG,
+    CDH_TELEMETRY_LOG,
+    CDH_ERROR_LOG,
+    NUM_LOGS
+} LogFile_t;
+
+const char * LogFileList[] =
+{
+    "cdhTasks",
+    "cdhTelem",
+    "cdhError"
+};
 
 void getCdhTelemetry(int argc, char **argv){}
 void checkCdhTelemetry(int argc, char **argv){}
 void requestCdhTelemetry(int argc, char **argv){}
+
+uint8_t decodeLogFileNames(char * arg)
+{
+    uint8_t i;
+    for(i=0; i < NUM_LOGS; i++)
+    {
+        if(strcmp(arg,LogFileList[i]) == 0)
+            return i;
+    }
+    return -1;
+}
+
+void downloadLogFile(int argc, char **argv){
+    
+    if(argc == 2)
+    {
+        if(strcmp(argv[1],"--help") == 0){
+            printf("downloadLogFile help:\n");
+            printf("-Command format: downloadLogFile [arg]\n");
+            printf("-Possible arguments:\n");
+            int i;
+            for(i=0; i < NUM_LOGS; i++)
+                printf(" - %s\n",LogFileList[i]);
+            return;
+        }
+        // Get log file name
+        int log_file_id = decodeLogFileNames(argv[1]);
+        if(log_file_id < 0){
+            printf("Invalid argument.\n");
+            printf("Enter the following command for valid arguments: downloadLogFile --help\n");
+            return;
+        }
+        // Create and send packet
+        telemetryPacket_t cmd;
+        cmd.telem_id = CDH_DOWNLOAD_LOG_FILE_CMD;
+        cmd.length = 1 * sizeof(uint8_t);
+        cmd.data[0] = log_file_id;
+        printf("Downloading log file: %s\n",LogFileList[log_file_id]);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+    }
+    else
+    {
+        printf("Invalid command (improper number of arguments - 1 required).\n");
+        printf("Enter the following command for valid log files: downloadLogFile --help\n");
+    }
+}
 
 void scheduleTTT(int argc, char **argv){
 
@@ -167,3 +227,4 @@ void getCdhTime(int argc, char **argv){
 
     }
 }
+

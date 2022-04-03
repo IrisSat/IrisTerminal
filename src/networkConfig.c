@@ -13,6 +13,9 @@ int nicknameToAddress(char * name){
     else if(strcmp(name,PAYLOAD_NICKNAME) == 0){
         return PAYLOAD_CSP_ADDRESS;
     }
+    else if(strcmp(name,COMMS_NICKNAME) == 0){
+        return COMMS_CSP_ADDRESS;
+    }
 
     return -1;
 }

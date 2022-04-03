@@ -11,6 +11,11 @@
 #include <csp/arch/csp_thread.h>
 #include "networkConfig.h"
 
+
+void pldBootCount(int argc, char **argv){
+
+}
+
 void sendImage(int argc, char **argv){
 
     

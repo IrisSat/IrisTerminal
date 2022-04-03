@@ -33,7 +33,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    40
+#define NUM_COMMANDS    41
 cmd_t commandTable[NUM_COMMANDS]= {
     {"help", printHelp, "Prints the help message."},
     {"send_image",sendImage,"Sends an image to the payload subsystem"},
@@ -50,6 +50,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"requestCdhTelem",requestCdhTelemetry,"Tells CDH to generate new CDH telemetry."},
     {"setCdhTime",setCdhTime,"Updates the time on CDH."},
     {"getCdhTime",getCdhTime,"Gets the time on CDH."},
+    {"downloadLogFile",downloadLogFile,"Download a log file from CDH."},
     {"downloadImage",downloadImage,"Gets an image from payload."},
     {"deleteImage",deleteImage,"Deletes a specified payload image."},
     {"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."},

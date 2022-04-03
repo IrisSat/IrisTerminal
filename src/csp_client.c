@@ -204,7 +204,7 @@ CSP_DEFINE_TASK(task_ping){
         int* pingAddr= (int*)param;
         int pingResult;
         pingResult = csp_ping(*pingAddr, 60000, 200, CSP_O_NONE);
-        printf("Ping with payload of %d bytes, took %d ms\n", 100, pingResult);
+        //printf("Ping with payload of %d bytes, took %d ms\n", 100, pingResult);
         return CSP_TASK_RETURN;
 }
 

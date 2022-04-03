@@ -19,6 +19,7 @@
 
 #define CDH_NICKNAME "cdh"
 #define PAYLOAD_NICKNAME "pld"
+#define COMMS_NICKNAME "comms"
 
 int nicknameToAddress(char * name);
 int getAddr(char * arg);

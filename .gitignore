@@ -1,6 +1,6 @@
 *.exe
 *.swp
 .vscode/launch.json
-.vscode/launch.json
+.vscode/settings.json
 *.jpg
 *.bmp
