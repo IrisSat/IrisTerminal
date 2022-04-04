@@ -405,14 +405,36 @@ int startcsp(char * comPort,int baudRate){
 
 	usart_set_callback(my_usart_rx);
 
-    res = csp_route_set(4, &csp_if_kiss, CSP_NODE_MAC);
+    res = csp_route_set(COMMS_CSP_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
     
         if(res != CSP_ERR_NONE){
         printf("ERROR");
         return -1;
     }
 
-    res = csp_route_set(5, &csp_if_kiss, CSP_NODE_MAC);
+    res = csp_route_set(CDH_CSP_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
+    
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+	
+    res = csp_route_set(PAYLOAD_CSP_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
+    
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+
+    res = csp_route_set(GROUND_CSP_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
+    
+        if(res != CSP_ERR_NONE){
+        printf("ERROR");
+        return -1;
+    }
+	
+    // send all messages to KISS by default
+    res = csp_route_set(0, &csp_if_kiss, CSP_NODE_MAC);
     
         if(res != CSP_ERR_NONE){
         printf("ERROR");
