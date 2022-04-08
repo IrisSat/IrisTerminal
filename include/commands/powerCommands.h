@@ -41,7 +41,7 @@ typedef enum
 
 
 void powReadTempChannel(int argc, char **argv);
-void powReadSolarCurrent(int argc, char **argv);
+void powReadSolarArrayCurrent(int argc, char **argv);
 void powReadLoadCurrent(int argc, char **argv);
 void powReadMsbVoltage(int argc, char **argv);
 void powSetLoadSwitch(int argc, char **argv);

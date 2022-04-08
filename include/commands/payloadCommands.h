@@ -5,7 +5,7 @@ void pldBootCount(int argc, char **argv);
 void pldSendImage(int argc, char **argv);
 void pldGetTelemetry(int argc,char **argv);
 void pldCheckTelemetry(int argc,char **argv);
-void requestPayloadTelemetry(int argc,char **argv);
+void pldRequestTelemetry(int argc,char **argv);
 void downloadImage(int argc, char **argv);
 void turnoncamera1(int argc, char **argv);
 void turnoffcamera1(int argc, char **argv);

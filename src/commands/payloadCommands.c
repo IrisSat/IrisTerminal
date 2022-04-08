@@ -224,7 +224,7 @@ void downloadImage(int argc, char **argv){
 }
 
 void pldCheckTelemetry(int argc,char **argv){}
-void requestPayloadTelemetry(int argc,char **argv){telemetryPacket_t cmd;
+void pldRequestTelemetry(int argc,char **argv){telemetryPacket_t cmd;
 
     //Set command timestamp to now.
     Calendar_t now;
