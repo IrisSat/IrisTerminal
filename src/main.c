@@ -33,7 +33,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    40
+#define NUM_COMMANDS    39
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {"help", printHelp, "Prints the help message."},
