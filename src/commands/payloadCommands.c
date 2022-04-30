@@ -445,3 +445,17 @@ void pldUnmountFS(int argc, char **argv){
     //cmd.data[0] = atoi(argv[1]);
     sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
 }
+
+void pldTestFs(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = PAYLOAD_TEST_FS;
+    cmd.length = 2; 
+    cmd.data[0] = atoi(argv[1]); //Send test number.
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+
+}

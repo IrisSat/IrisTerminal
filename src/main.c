@@ -33,7 +33,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    39
+#define NUM_COMMANDS    40
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {"help", printHelp, "Prints the help message."},
@@ -69,6 +69,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"icc1",takeimagecamera1,"Take image with camera 1."},
     {"icc2",takeimagecamera2,"Take image with camera 2."},
     {"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
+    {"pldTestFs", pldTestFs, "Runs the specified filesystem test."},
     // Power Commands
     {"powReadTemp",powReadTempChannel,"Power - Read a temperature channel."},
     {"powReadSAC",powReadSolarArrayCurrent,"Power - Read a solar array current value."},

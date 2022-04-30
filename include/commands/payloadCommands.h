@@ -20,5 +20,6 @@ void pldFileList(int argc, char **argv);
 void deleteImage(int argc, char **argv);
 void pldMountFS(int argc, char **argv);
 void pldUnmountFS(int argc, char **argv);
+void pldTestFs(int argc, char **argv);
 
 #endif
