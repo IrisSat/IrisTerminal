@@ -50,7 +50,7 @@ void powReadTempChannel(int argc, char **argv){
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powReadTemp help:\n");
-            printf("-Command format: powReadTemp [arg]\n");
+            printf("-Command format: powReadTemp [channel]\n");
             printf("-Possible arguments: 0-6\n");
             return;
         }
@@ -92,7 +92,7 @@ void powReadSolarArrayCurrent(int argc, char **argv){
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powReadSC help:\n");
-            printf("-Command format: powReadSC [arg]\n");
+            printf("-Command format: powReadSAC [channel]\n");
             printf("-Possible arguments: 0-6\n");
             return;
         }
@@ -124,7 +124,7 @@ void powReadSolarArrayCurrent(int argc, char **argv){
 
     } else {
         printf("Invalid command (improper number of arguments - 1 required).\n");
-        printf("Enter the following command for valid modes: powReadSC --help\n");
+        printf("Enter the following command for valid modes: powReadSAC --help\n");
     }
 
 }
@@ -133,7 +133,7 @@ void powReadLoadCurrent(int argc, char **argv){
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powReadLC help:\n");
-            printf("-Command format: powReadLC [arg]\n");
+            printf("-Command format: powReadLC [channel]\n");
             printf("-Possible arguments:\n");
             int i;
             for(i=0; i < NUM_LOAD_CURRENT_CHANNELS; i++)
@@ -177,7 +177,7 @@ void powReadMsbVoltage(int argc, char **argv){
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powReadMsbVoltage help:\n");
-            printf("-Command format: powSetLoadSwitch\n");
+            printf("-Command format: powReadMsbVoltage\n");
             printf("-No arguments required:\n");
         } else {
             printf("Invalid command (improper number of arguments - none required).\n");
@@ -218,7 +218,7 @@ void powSetLoadSwitch(int argc, char **argv)
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powSetLoadSwitch help:\n");
-            printf("-Command format: powSetLoadSwitch [arg] [on|off]\n");
+            printf("-Command format: powSetLoadSwitch [switch] [state]\n");
             printf("-Possible arguments:\n");
             int i;
             for(i=0; i < NUM_LOAD_SWITCHES; i++)
@@ -276,12 +276,12 @@ void powSetLoadSwitch(int argc, char **argv)
         printf("Enter the following command for valid modes: powSetLoadSwitch --help\n");
     }
 }
-void powSetSolar(int argc, char **argv)
+void powSetSolarSwitch(int argc, char **argv)
 {
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powSetSolar help:\n");
-            printf("-Command format: powSetSolar [arg] [on|off]\n");
+            printf("-Command format: powSetSolar [channel] [state]\n");
             printf("-Possible arguments: 0-6\n");
         } else {
             printf("Invalid command (improper number of arguments - 2 required).\n");
@@ -340,7 +340,7 @@ void powSetMode(int argc, char **argv){
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powSetMode help:\n");
-            printf("-Command format: powSetMode [arg]\n");
+            printf("-Command format: powSetMode [mode]\n");
             printf("-Possible arguments:\n");
             int i;
             for(i=0; i < NUM_POWER_MODES; i++)

@@ -33,7 +33,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    39
+#define NUM_COMMANDS    49
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {"help", printHelp, "Prints the help message."},
@@ -65,17 +65,28 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"turnOffCamera2",turnoffcamera2,"Turn off camera 2."},
     {"resetCamera1",resetcamera1,"Reset camera 1."},
     {"resetCamera2",resetcamera2,"Reset camera 2."},
+    {"pldCamHs",pldCameraHandshake,"Do a handshake with one of the two cameras."},
+    {"pldCamInit",pldCameraSensorInit,"Initialize one of the two cameras."},
+    {"pldCamTxAddr",pldCameraSetI2cWriteAddress,"Sets Payload camera I2C write address."},
+    {"pldCamRxAddr",pldCameraSetI2cReadAddress,"Sets Payload camera I2C read address."},
+    {"pldCamTxData",pldCameraI2cTransmit,"Transmit I2C data to one of the two cameras."},
+    {"pldCamRegListWrite",pldCameraRegListWrite,"Write a list of Payload camera registers."},
+    {"pldCamTest",pldTestCameraInit,"Test Payload camera initialization."},
+    // pldCameraRegListWrite
     {"listofImages",listofimages,"List of images."},
     {"icc1",takeimagecamera1,"Take image with camera 1."},
     {"icc2",takeimagecamera2,"Take image with camera 2."},
     {"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
+    {"pldMountFs",pldMountFS,"Mount Payload filesystem."},
+    {"pldUnmountFs",pldUnmountFS,"Unmount Payload filesystem."},
+    {"pldRestartFs",pldRestartFS,"Restart Payload filesystem."},
     // Power Commands
     {"powReadTemp",powReadTempChannel,"Power - Read a temperature channel."},
     {"powReadSAC",powReadSolarArrayCurrent,"Power - Read a solar array current value."},
     {"powReadLC",powReadLoadCurrent,"Power - Read a load current value."},
     {"powReadMsbVoltage",powReadMsbVoltage,"Power - Read MSB voltage value."},
     {"powSetLoadSwitch",powSetLoadSwitch,"Power - Set load switch on/off."},
-    {"powSetSolar",powSetSolar,"Power - Set solar array switch on/off."},
+    {"powSetSolarSwitch",powReadSolarArrayCurrent,"Power - Set solar array switch on/off."},
     {"powSetMode",powSetMode,"Power - Set power mode."},
     // Comms Commands
     {"sendCommsMessage",commsSendCSPMessage,"Send COMMS a message."},

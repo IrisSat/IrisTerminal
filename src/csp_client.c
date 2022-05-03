@@ -5,6 +5,8 @@
 #include <csp/drivers/usart.h>
 #include <csp/arch/csp_thread.h>
 
+#include <math.h>
+
 #include "csp_client.h"
 #include "networkConfig.h"
 #include "telemetry.h"
@@ -27,6 +29,10 @@ int imageDownloadState=0;
 char imageDownloadFile[100] = "";
 FILE * imageFileHandle;
 int imageChunksLeft =0;
+int imageChunksRcvd = 0;
+int prevDownloadPercentage = 100;
+int MAX_IMAGE_CHUNKS = 2700;
+int IMAGE_PERCENT_DELTA = 2;
 
 CSP_DEFINE_TASK(task_server) {
 
@@ -72,6 +78,7 @@ int running = 1;
                                 uint32_t numChunks = *((uint32_t*)&telem.data[sizeof(uint32_t)]);
                                 imageChunksLeft = numChunks;
                                 printf("Getting ready to receive image of %d bytes, in %d chunks.\n",size,numChunks);
+                                imageChunksRcvd = numChunks;
 
                                 if(imageFileHandle != NULL) fclose(imageFileHandle);
 
@@ -89,7 +96,15 @@ int running = 1;
                             imageChunksLeft --;
                             memcpy(buff,&telem.data[4],telem.length-4); //Copy actual data
                             fwrite(buff,1,telem.length-4,imageFileHandle);
+
                             printf("chunks left:%d \n",imageChunksLeft);
+                            // float downloadPercentage = ((float)imageChunksLeft/(float)imageChunksRcvd*100.00);
+                            // printf("Remaining: %d\nRcvd: %d\n, Percentage: %.2f\nInt Percentage: %d\n,Int Percentage mod 10: %d\n",imageChunksLeft,imageChunksRcvd,downloadPercentage,(int)downloadPercentage,(int)downloadPercentage%10);
+                            // if((int)downloadPercentage % 10 == 0 && prevDownloadPercentage != (int)downloadPercentage){
+                            //     printf("Download Percentage: %d\n",100-(int)downloadPercentage);
+                            // }
+                            // prevDownloadPercentage = (int)downloadPercentage;
+
                             if(imageChunksLeft == 0 ){
                                 fclose(imageFileHandle);
                                 imageChunksLeft = 0;

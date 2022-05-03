@@ -10,12 +10,158 @@
 #include "csp_client.h"
 #include <csp/arch/csp_thread.h>
 #include "networkConfig.h"
+#include "cameraRegLists.h"
 
+/*
 
+void functionTemplate(int argc, char **argv){
+    if(argc == ){
+        uint8_t param = atoi(argv[]);
+        if(param < 1 || param > 2){
+            printf("Improper param value.\n");
+            return;
+        }
+        telemetryPacket_t cmd;
+        cmd.telem_id  = ;
+        cmd.length = ;
+        cmd.data[0] = param;
+        printf("Sending command with param %d\n",param);
+        sendCommand(&cmd,_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
+*/
+
+void pldTestCameraInit(int argc, char **argv){
+    telemetryPacket_t cmd = {0};
+    cmd.telem_id  = PAYLOAD_CAMERA_TEST_INIT;
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+void pldCameraRegListWrite(int argc, char **argv){
+    if(argc == 2){
+        uint8_t regListIdx = atoi(argv[1]);
+        if(regListIdx < 0 || regListIdx >= NUM_REG_LISTS){
+            printf("Improper register list number value.\n");
+            return;
+        }
+        telemetryPacket_t cmd;
+        s_RegList * regList;
+        cmd.telem_id  = PAYLOAD_CAMERA_WRITE_REG_LIST;
+        cmd.length = getRegisterListSize(regListIdx);
+        // cmd.data = getRegisterList(regListIdx);
+        getRegisterList(regListIdx,cmd.data);
+        printf("Register list size: %d\n",cmd.length);
+        // sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
+
+void pldCameraSetI2cWriteAddress(int argc, char **argv){
+    if(argc == 2){
+        int paramLength = strlen(argv[1]);
+        if(paramLength < 0 || paramLength > 2){
+            printf("Arg length error: %s\n",argv[1]);
+            return;
+        }
+        uint8_t param = atoi(argv[1]);
+        telemetryPacket_t cmd;
+        cmd.telem_id  = PAYLOAD_CAMERA_SET_I2C_WRITE_ADDRESS;
+        cmd.length = 1;
+        cmd.data[0] = param;
+        printf("Setting Payload camera I2c write address to: 0x%2X\n",param);
+        sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
+void pldCameraSetI2cReadAddress(int argc, char **argv){
+    if(argc == 2){
+        int paramLength = strlen(argv[1]);
+        if(paramLength < 0 || paramLength > 2){
+            printf("Arg length error: %s\n",argv[1]);
+            return;
+        }
+        uint8_t param = atoi(argv[1]);
+        telemetryPacket_t cmd;
+        cmd.telem_id  = PAYLOAD_CAMERA_SET_I2C_READ_ADDRESS;
+        cmd.length = 1;
+        cmd.data[0] = param;
+        printf("Setting Payload camera I2c read address to: 0x%2X\n",param);
+        sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
+void pldCameraI2cTransmit(int argc, char **argv){
+    printf("I2C transmit: argc = %d\n",argc);
+    if(argc > 2){
+        uint8_t cmd_data[argc-1];
+        cmd_data[0] = atoi(argv[1]);
+        int i;
+        for(i=2; i < argc; i++){
+            printf("%d of %d\n",i,sizeof(cmd_data)/sizeof(uint8_t));
+            // int paramLength = strlen(argv[i]);
+            // if(paramLength < 0 || paramLength > 2){
+            //     printf("Arg length error: argv[%d] = %s\n (length = %d)",i,argv[i],paramLength);
+            //     return;
+            // }
+            // printf("Arg[%d]: 0x%s\n",i,argv[i]);
+            // int value = (int) strtol(argv[i], NULL, 8);
+            // cmd_data[i-1] = (uint8_t) value;
+            // cmd_data[i-1] = (uint8_t) strtol(argv[i], NULL, 8);
+            // printf("Value = %d\n",cmd_data[i-1]);
+            cmd_data[i-1] = (uint8_t) atoi(argv[i]);
+        }
+        printf("Parameters set.\n");
+        telemetryPacket_t cmd;
+        cmd.telem_id  = PAYLOAD_CAMERA_I2C_TRANSMIT;
+        cmd.length = argc-1;
+        cmd.data = cmd_data;
+        printf("Payload camera I2C transmit...\n");
+        sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
+void pldCameraHandshake(int argc, char **argv){
+    if(argc == 2){
+        uint8_t camNum = atoi(argv[1]);
+        if(camNum < 1 || camNum > 2){
+            printf("Improper camera number.\n");
+            return;
+        }
+        telemetryPacket_t cmd;
+        cmd.telem_id  = PAYLOAD_CAMERA_HANDSHAKE;
+        cmd.length = 1;
+        cmd.data[0] = camNum;
+        printf("Initializing camera %d\n",camNum);
+        sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
+void pldCameraSensorInit(int argc, char **argv){
+    if(argc == 2){
+        uint8_t camNum = atoi(argv[1]);
+        if(camNum < 1 || camNum > 2){
+            printf("Improper camera number.\n");
+            return;
+        }
+        telemetryPacket_t cmd;
+        cmd.telem_id  = PAYLOAD_CAMERA_SENSOR_INIT;
+        cmd.length = 1;
+        cmd.data[0] = camNum;
+        printf("Initializing camera %d\n",camNum);
+        sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    } else {
+        printf("Improper number of arguments.\n");
+    }
+}
 void pldBootCount(int argc, char **argv){
 
 }
-
 void pldSendImage(int argc, char **argv){
     if(argc != 2){
         printf("incorrect parameteres...");
@@ -421,27 +567,30 @@ void deleteImage(int argc, char **argv){
 }
 
 void pldMountFS(int argc, char **argv){
-    
     telemetryPacket_t cmd;
-    //Set command timestamp to now.
     Calendar_t now;
     getCalendarNow(&now);
     cmd.timestamp = now;
     cmd.telem_id = PAYLOAD_MOUNT_FS;
-    cmd.length = 1; //We send an updated time.
-    //cmd.data[0] = atoi(argv[1]);
+    cmd.length = 1;
     sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
 }
 
 void pldUnmountFS(int argc, char **argv){
-    
     telemetryPacket_t cmd;
-    //Set command timestamp to now.
     Calendar_t now;
     getCalendarNow(&now);
     cmd.timestamp = now;
     cmd.telem_id = PAYLOAD_UNMOUNT_FS;
-    cmd.length = 1; //We send an updated time.
-    //cmd.data[0] = atoi(argv[1]);
+    cmd.length = 1;
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+}
+void pldRestartFS(int argc, char **argv){
+    telemetryPacket_t cmd;
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = PAYLOAD_RESTART_FS;
+    cmd.length = 1;
     sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
 }

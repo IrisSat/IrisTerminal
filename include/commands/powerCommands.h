@@ -45,7 +45,7 @@ void powReadSolarArrayCurrent(int argc, char **argv);
 void powReadLoadCurrent(int argc, char **argv);
 void powReadMsbVoltage(int argc, char **argv);
 void powSetLoadSwitch(int argc, char **argv);
-void powSetSolar(int argc, char **argv);
+void powSetSolarSwitch(int argc, char **argv);
 void powSetMode(int argc, char **argv);
 
 int decodeLoadCurrentChannel(char * arg);
