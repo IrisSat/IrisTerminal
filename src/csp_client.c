@@ -169,6 +169,16 @@ int running = 1;
                             printf("POWER_READ_MSB_VOLTAGE_ID: %.3f\n",temp);
                             break;
                         }
+                        case POWER_GET_BATTERY_SOC_ID:{
+                            float temp;
+                            memcpy(&temp,telem.data,4);
+                            printf("POWER_GET_BATTERY_SOC_ID: %.3f\n",temp);
+                            break;
+                        }
+                        case POWER_GET_ECLIPSE_ID:{
+                            printf("POWER_GET_ECLIPSE_ID: %d\n",telem.data[0]);
+                            break;
+                        }
 
                     }
                     printf("\nIris>");

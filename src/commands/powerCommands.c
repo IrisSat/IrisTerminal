@@ -45,6 +45,8 @@ const char * PowerModeStrings[] =
     "science"
 };
 
+// --- Get methods ---
+
 void powReadTempChannel(int argc, char **argv){
 
     if(argc == 2){
@@ -212,6 +214,84 @@ void powReadMsbVoltage(int argc, char **argv){
 
 }
 
+void powGetBatterySoc(int argc, char **argv){
+    if(argc == 2){
+        if(strcmp(argv[1],"--help") == 0){
+            printf("powGetBatterySoc help:\n");
+            printf("-Command format: powGetBatterySoc\n");
+            printf("-No arguments required:\n");
+        } else {
+            printf("Invalid command (improper number of arguments - none required).\n");
+            printf("Enter the following command for valid modes: powGetBatterySoc --help\n");
+        }
+    }
+    else if(argc == 1){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        timeToCalendar(tm,&now);
+        cmd.timestamp = now;
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_GET_BATTERY_SOC; //First arg is the task code.
+        cmd_data[1] = 0; // Task doesn't require a parameter
+        // Send the TTT
+        printf("Getting Battery State of Charge\n");
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+    } else {
+        printf("Invalid command (improper number of arguments - none required).\n");
+        printf("Enter the following command for valid modes: powGetBatterySoc --help\n");
+    }
+}
+
+void powGetEclipse(int argc, char **argv){
+    if(argc == 2){
+        if(strcmp(argv[1],"--help") == 0){
+            printf("powGetEclipse help:\n");
+            printf("-Command format: powGetEclipse\n");
+            printf("-No arguments required:\n");
+        } else {
+            printf("Invalid command (improper number of arguments - none required).\n");
+            printf("Enter the following command for valid modes: powGetEclipse --help\n");
+        }
+    }
+    else if(argc == 1){
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        timeToCalendar(tm,&now);
+        cmd.timestamp = now;
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_POWER_GET_ECLIPSE; //First arg is the task code.
+        cmd_data[1] = 0; // Task doesn't require a parameter
+        // Send the TTT
+        printf("Getting eclipse state\n");
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+    } else {
+        printf("Invalid command (improper number of arguments - none required).\n");
+        printf("Enter the following command for valid modes: powGetEclipse --help\n");
+    }
+}
+
+
+// --- Set methods ---
 
 void powSetLoadSwitch(int argc, char **argv)
 {
@@ -380,7 +460,103 @@ void powSetMode(int argc, char **argv){
     }
 
 }
+//-- AIT --
+void powAitSetBatterySoc(int argc, char **argv){
 
+
+    // printf("Not yet implemented\n");
+    if(argc == 2){
+        if(strcmp(argv[1],"--help") == 0){
+            printf("powAitSetBatterySoc help:\n");
+            printf("-Command format: powAitSetBatterySoc [mode]\n");
+            printf("-Possible arguments: [soc]\n");
+            printf(" -numerical value\n");
+            return;
+        }
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        timeToCalendar(tm,&now);
+        cmd.timestamp = now;
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t) + 1*sizeof(float) + sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[1*sizeof(uint8_t) + 1*sizeof(float) + sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_AIT_POWER_SET_BATTERY_SOC_CMD; //First arg is the task code.
+        // *** Need to fix input argument format ***
+        float soc = atof(argv[1]);
+        if(soc < 0.0){
+            soc = 0.0;
+        } else if(soc > 1.0){
+            soc = 1.0;
+        }
+        cmd_data[1] = 0xFF;
+        cmd_data[2] = 0xFF;
+        cmd_data[3] = 0xFF;
+        cmd_data[4] = 0xFF;
+        // memcpy(cmd_data[1],&soc,sizeof(float));
+        // Send the TTT
+        printf("Setting battery state of charge: %.2f\n",soc);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+    } else {
+        printf("Invalid command (improper number of arguments - 1 required).\n");
+        printf("Enter the following command for valid modes: powAitSetBatterySoc --help\n");
+    }
+
+}
+
+void powAitSetEclipse(int argc, char **argv){
+
+    if(argc == 2){
+        if(strcmp(argv[1],"--help") == 0){
+            printf("powAitSetEclipse help:\n");
+            printf("-Command format: powAitSetEclipse [state]\n");
+            printf("-Possible arguments: [state]\n");
+            printf(" -off\n");
+            printf(" -on\n");
+            return;
+        }
+        // Create a telemtry packet
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        timeToCalendar(tm,&now);
+        cmd.timestamp = now;
+        // TTT ID 
+        cmd.telem_id = CDH_SCHEDULE_TTT_CMD;
+        cmd.length = 2*sizeof(uint8_t)+ sizeof(Calendar_t); //We need to send the task code, and when to execute.
+        // Format Data
+        uint8_t cmd_data[2*sizeof(uint8_t)+ sizeof(Calendar_t)] = {0};
+        cmd.data = cmd_data;
+        cmd_data[0] = TASK_AIT_POWER_SET_ECLIPSE; //First arg is the task code.
+        // *** Need to fix input argument format ***
+        uint8_t state;
+        if(strcmp(argv[1],"off") == 0) state = 0;
+        else if(strcmp(argv[1],"on") == 0) state = 1;
+        else {
+            printf("Invalid powAitSetEclipse argument [state].\n");
+            printf("Enter the following command for valid state: powAitSetEclipse --help\n");
+        }
+        // Send the TTT
+        printf("Setting eclipse state: %d\n",state);
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+    } else {
+        printf("Invalid command (improper number of arguments - 1 required).\n");
+        printf("Enter the following command for valid states: powAitSetEclipse --help\n");
+    }
+
+}
+
+
+// --- Helper methods ---
 
 int decodeLoadCurrentChannel(char * arg)
 {

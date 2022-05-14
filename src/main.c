@@ -33,7 +33,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    49
+#define NUM_COMMANDS    53
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {"help", printHelp, "Prints the help message."},
@@ -88,6 +88,10 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"powSetLoadSwitch",powSetLoadSwitch,"Power - Set load switch on/off."},
     {"powSetSolarSwitch",powReadSolarArrayCurrent,"Power - Set solar array switch on/off."},
     {"powSetMode",powSetMode,"Power - Set power mode."},
+    {"powGetSoc",powGetBatterySoc,"Power - Get battery state of charge."},
+    {"powGetEclipse",powGetEclipse,"Power - Get state of eclipse."},
+    {"powSetSoc",powAitSetBatterySoc,"Power AIT - Set battery state of charge."},
+    {"powSetEclipse",powAitSetEclipse,"Power AIT - Set state of eclipse."},
     // Comms Commands
     {"sendCommsMessage",commsSendCSPMessage,"Send COMMS a message."},
 };
