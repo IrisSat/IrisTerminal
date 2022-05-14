@@ -12,6 +12,8 @@
 #include "networkConfig.h"
 #include "telemetry.h"
 #include <time.h>
+#include <checksum.h>
+
 
 typedef enum
 {
@@ -27,6 +29,14 @@ const char * LogFileList[] =
     "cdhTelem",
     "cdhError"
 };
+
+typedef struct{
+    char filename[64];//Filename of the firmware.
+    uint32_t filesize;//Filesize in bytes. For use in receiving and as extra check.
+    uint32_t checksum;//crc-32 full file checksum.
+
+}Fw_metadata_t;
+void checksum_file(uint32_t * out, FILE * in);//Out must be pointer to 32 bit int where result will go. In must be opened file, seek will be set back to start on function return.
 
 void cdhGetTelemetry(int argc, char **argv){}
 void cdhCheckTelemetry(int argc, char **argv){}
@@ -228,3 +238,122 @@ void cdhGetTime(int argc, char **argv){
     }
 }
 
+void cdhFileList(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_LIST_FILES_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+int cmdRead(char *cmd,char *output, int outLen)
+{
+    FILE *p = popen(cmd, "r");
+    if (p == NULL) return 0;
+    char buf[256]={0};
+    int left = outLen;
+    while(fgets(buf,256,p) != NULL){
+
+        strncpy(output,buf,left);
+        left= left-strlen(buf);
+    }
+    pclose(p);
+    
+}
+
+void checksum_file(uint32_t * out, FILE * in){
+
+    //Based on the libcrc example/test program.
+    uint32_t crc_32_val;
+    char ch;
+    unsigned char prev_byte;
+    fseek(in, 0, SEEK_SET);
+        if ( in != NULL ) {
+
+            while( ( ch=fgetc( in ) ) != EOF ) {
+
+
+                crc_32_val = update_crc_32(     crc_32_val,         (unsigned char) ch            );
+
+                prev_byte = (unsigned char) ch;
+            }
+
+            fseek(in, 0, SEEK_SET);
+        }
+    
+
+    crc_32_val        ^= 0xffffffffL;
+
+    *out = crc_32_val;
+}
+
+void cdhUploadFw(int argc, char **argv){
+
+    if(argc != 3){
+        printf("incorrect parameteres...");
+    }
+    else{
+
+        printf("Sending fw to the cdh board...\n");
+
+        const int chunkSize = 250; //CAN MTU is 255? 
+        char* fileName = argv[1];
+        FILE * fwFile;
+        fwFile = fopen(fileName,"rb");
+        if(fwFile == NULL){
+            printf("Error opneing file %s\n",argv);
+            goto END;
+        }
+
+        fseek(fwFile, 0, SEEK_END); // seek to end of file
+        long fileSize_B= ftell(fwFile); // get current file pointer
+        fseek(fwFile, 0, SEEK_SET); // seek back to beginning of file
+
+        double numChunks_dec = fileSize_B/chunkSize;
+        int numChunks = (int)ceil(numChunks_dec);
+
+        printf("Splitting the fw(%dkiB) into %d chunks of size %d B.\n",fileSize_B/1024,numChunks,chunkSize);
+        // proceed with allocating memory and reading the file
+
+        uint8_t* chunk;
+        chunk = malloc(chunkSize);
+        if(chunk == NULL){
+            printf("Error allocating memory... Download some more RAM!\n");
+        }
+
+        //Start by telling cdh fw_update_mgr to enter the "receiveing update" state, along with basic info...
+        Fw_metadata_t fw_info;
+        printf("%s\n",argv[2]);
+        strcpy(fw_info.filename,argv[2]);
+
+        fw_info.filesize = fileSize_B;
+        printf("Filename %s filesize %d\n",fw_info.filename,fw_info.filesize);
+
+        //Get checksum for file...
+        uint32_t checksum;
+        char cmd_str[128];
+        checksum_file(&checksum,fwFile);
+        printf("fw checksum: %0x\n",checksum);
+        fw_info.checksum = checksum;
+
+        
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        getCalendarNow(&now);
+        cmd.timestamp = now;
+        cmd.telem_id = CDH_LIST_FILES_CMD;
+        cmd.length = sizeof(Fw_metadata_t);; //We send an updated time.
+        memcpy(cmd.data,&fw_info,sizeof(fw_info)); 
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+
+    }
+
+    END: 
+        printf("done\n");
+}

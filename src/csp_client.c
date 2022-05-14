@@ -11,6 +11,9 @@
 #include "networkConfig.h"
 #include "telemetry.h"
 
+#include "handlers/cdhHandler.h"
+
+
 #define PORT 10
 #define MY_ADDRESS 9
 #define CDH_ADDRESS 0
@@ -67,110 +70,121 @@ int running = 1;
                     
                     telemetryPacket_t telem;
                     unpackTelemetry(packet->data,&telem);
+                    
+                    switch(csp_conn_src(conn)){
 
-                    switch(telem.telem_id){
+                        case CDH_CSP_ADDRESS:{
+                            cdhTelemetryHandler(&telem);
+                        }
+                        case PAYLOAD_CSP_ADDRESS:{
 
-                        case PAYLOAD_ACK:{
+                            switch(telem.telem_id){
 
-                            if(imageDownloadState == 1){
+                                case PAYLOAD_ACK:{
 
-                                uint32_t size = *((uint32_t*)&telem.data[0]);
-                                uint32_t numChunks = *((uint32_t*)&telem.data[sizeof(uint32_t)]);
-                                imageChunksLeft = numChunks;
-                                printf("Getting ready to receive image of %d bytes, in %d chunks.\n",size,numChunks);
-                                imageChunksRcvd = numChunks;
+                                    if(imageDownloadState == 1){
 
-                                if(imageFileHandle != NULL) fclose(imageFileHandle);
+                                        uint32_t size = *((uint32_t*)&telem.data[0]);
+                                        uint32_t numChunks = *((uint32_t*)&telem.data[sizeof(uint32_t)]);
+                                        imageChunksLeft = numChunks;
+                                        printf("Getting ready to receive image of %d bytes, in %d chunks.\n",size,numChunks);
+                                        imageChunksRcvd = numChunks;
 
-                                imageFileHandle = fopen(imageDownloadFile,"wb");
-                                if(imageFileHandle == NULL){
-                                    printf("Could not open file %s\n",imageDownloadFile);
+                                        if(imageFileHandle != NULL) fclose(imageFileHandle);
+
+                                        imageFileHandle = fopen(imageDownloadFile,"wb");
+                                        if(imageFileHandle == NULL){
+                                            printf("Could not open file %s\n",imageDownloadFile);
+                                        }
+                                    }
+                                    break;
                                 }
+
+                                case PAYLOAD_FULL_IMAGE_ID:{
+
+                                    uint8_t buff[256];
+                                    imageChunksLeft --;
+                                    memcpy(buff,&telem.data[4],telem.length-4); //Copy actual data
+                                    fwrite(buff,1,telem.length-4,imageFileHandle);
+
+                                    printf("chunks left:%d \n",imageChunksLeft);
+                                    // float downloadPercentage = ((float)imageChunksLeft/(float)imageChunksRcvd*100.00);
+                                    // printf("Remaining: %d\nRcvd: %d\n, Percentage: %.2f\nInt Percentage: %d\n,Int Percentage mod 10: %d\n",imageChunksLeft,imageChunksRcvd,downloadPercentage,(int)downloadPercentage,(int)downloadPercentage%10);
+                                    // if((int)downloadPercentage % 10 == 0 && prevDownloadPercentage != (int)downloadPercentage){
+                                    //     printf("Download Percentage: %d\n",100-(int)downloadPercentage);
+                                    // }
+                                    // prevDownloadPercentage = (int)downloadPercentage;
+
+                                    if(imageChunksLeft == 0 ){
+                                        fclose(imageFileHandle);
+                                        imageChunksLeft = 0;
+                                        imageDownloadState =0;
+                                        printf("Done receiving image.\n");
+                                    }
+                                    break;
+                                }
+
+                                case PAYLOAD_FILE_LIST_ID:{
+                                    uint8_t buf[telem.length];
+                                    snprintf(buf,telem.length,"%s",telem.data);
+                                    printf("PAYLOAD_FILE_LIST_ID: %s\n",buf);
+                                    break;
+                                }
+
+                                case PAYLOAD_ERROR_ID:{
+                                    uint8_t errorMsg[telem.length];
+                                    snprintf(errorMsg,telem.length,"%s",telem.data);
+                                    printf("PAYLOAD_ERROR_ID: %s\n",errorMsg);
+                                    break;
+                                }
+
+                                case PAYLOAD_META_ID:{
+                                    uint8_t errorMsg[telem.length];
+                                    snprintf(errorMsg,telem.length,"%s",telem.data);
+                                    printf("PAYLOAD_META_ID: %s\n",errorMsg);
+                                    break;
+                                }
+
+                                case PAYLOAD_MSG_ID:{
+                                    uint8_t msg[telem.length];
+                                    snprintf(msg,telem.length,"%s",telem.data);
+                                    printf("PAYLOAD_MSG_ID: %s\n",msg);
+                                    break;
+                                }
+
+                                case POWER_READ_TEMP_ID:{
+                                    float temp;
+                                    memcpy(&temp,telem.data,4);
+                                    printf("POWER_READ_TEMP_ID: %.3f\n",temp);
+                                    // for(int i=0; i < 4; i++){
+                                    //     printf("[%d] - 0x%2X\n",i,telem.data[i]);
+                                    // }
+                                    break;
+                                }
+                                case POWER_READ_SOLAR_CURRENT_ID:{
+                                    float temp;
+                                    memcpy(&temp,telem.data,4);
+                                    printf("POWER_READ_SOLAR_CURRENT_ID: %.3f\n",temp);
+                                    break;
+                                }
+                                case POWER_READ_LOAD_CURRENT_ID:{
+                                    float temp;
+                                    memcpy(&temp,telem.data,4);
+                                    printf("POWER_READ_LOAD_CURRENT_ID: %.3f\n",temp);
+                                    break;
+                                }
+                                case POWER_READ_MSB_VOLTAGE_ID:{
+                                    float temp;
+                                    memcpy(&temp,telem.data,4);
+                                    printf("POWER_READ_MSB_VOLTAGE_ID: %.3f\n",temp);
+                                    break;
+                                }
+
                             }
                             break;
                         }
-
-                        case PAYLOAD_FULL_IMAGE_ID:{
-
-                            uint8_t buff[256];
-                            imageChunksLeft --;
-                            memcpy(buff,&telem.data[4],telem.length-4); //Copy actual data
-                            fwrite(buff,1,telem.length-4,imageFileHandle);
-
-                            printf("chunks left:%d \n",imageChunksLeft);
-                            // float downloadPercentage = ((float)imageChunksLeft/(float)imageChunksRcvd*100.00);
-                            // printf("Remaining: %d\nRcvd: %d\n, Percentage: %.2f\nInt Percentage: %d\n,Int Percentage mod 10: %d\n",imageChunksLeft,imageChunksRcvd,downloadPercentage,(int)downloadPercentage,(int)downloadPercentage%10);
-                            // if((int)downloadPercentage % 10 == 0 && prevDownloadPercentage != (int)downloadPercentage){
-                            //     printf("Download Percentage: %d\n",100-(int)downloadPercentage);
-                            // }
-                            // prevDownloadPercentage = (int)downloadPercentage;
-
-                            if(imageChunksLeft == 0 ){
-                                fclose(imageFileHandle);
-                                imageChunksLeft = 0;
-                                imageDownloadState =0;
-                                printf("Done receiving image.\n");
-                            }
-                            break;
-                        }
-
-                        case PAYLOAD_FILE_LIST_ID:{
-                            uint8_t buf[telem.length];
-                            snprintf(buf,telem.length,"%s",telem.data);
-                            printf("PAYLOAD_FILE_LIST_ID: %s\n",buf);
-                            break;
-                        }
-
-                        case PAYLOAD_ERROR_ID:{
-                            uint8_t errorMsg[telem.length];
-                            snprintf(errorMsg,telem.length,"%s",telem.data);
-                            printf("PAYLOAD_ERROR_ID: %s\n",errorMsg);
-                            break;
-                        }
-
-                        case PAYLOAD_META_ID:{
-                            uint8_t errorMsg[telem.length];
-                            snprintf(errorMsg,telem.length,"%s",telem.data);
-                            printf("PAYLOAD_META_ID: %s\n",errorMsg);
-                            break;
-                        }
-
-                        case PAYLOAD_MSG_ID:{
-                            uint8_t msg[telem.length];
-                            snprintf(msg,telem.length,"%s",telem.data);
-                            printf("PAYLOAD_MSG_ID: %s\n",msg);
-                            break;
-                        }
-
-                        case POWER_READ_TEMP_ID:{
-                            float temp;
-                            memcpy(&temp,telem.data,4);
-                            printf("POWER_READ_TEMP_ID: %.3f\n",temp);
-                            // for(int i=0; i < 4; i++){
-                            //     printf("[%d] - 0x%2X\n",i,telem.data[i]);
-                            // }
-                            break;
-                        }
-                        case POWER_READ_SOLAR_CURRENT_ID:{
-                            float temp;
-                            memcpy(&temp,telem.data,4);
-                            printf("POWER_READ_SOLAR_CURRENT_ID: %.3f\n",temp);
-                            break;
-                        }
-                        case POWER_READ_LOAD_CURRENT_ID:{
-                            float temp;
-                            memcpy(&temp,telem.data,4);
-                            printf("POWER_READ_LOAD_CURRENT_ID: %.3f\n",temp);
-                            break;
-                        }
-                        case POWER_READ_MSB_VOLTAGE_ID:{
-                            float temp;
-                            memcpy(&temp,telem.data,4);
-                            printf("POWER_READ_MSB_VOLTAGE_ID: %.3f\n",temp);
-                            break;
-                        }
-
                     }
+                    
                     printf("\nIris>");
                     break;
                 }
@@ -377,7 +391,7 @@ int csp_transaction_2port(uint8_t prio, uint8_t dest, uint8_t port, uint8_t rx_p
 }
 
 int startcsp(char * comPort,int baudRate){
-    csp_debug_toggle_level(CSP_PACKET);
+    // csp_debug_toggle_level(CSP_PACKET);
     csp_debug_toggle_level(CSP_INFO);
 
     int res = csp_buffer_init(100, 300);

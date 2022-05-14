@@ -21,6 +21,7 @@
 //Local Functions
 static void printHelp(int argc, char ** argv);
 static void quitTerminal(int argc, char ** argv);
+static void setDebugLevel(int argc, char** argv);
 int setupTerminal();
 char * getline_(void);
 int makeargs(char *args, int *argc, char ***aa);
@@ -33,25 +34,29 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    49
+#define NUM_COMMANDS    52
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {"help", printHelp, "Prints the help message."},
     {"quit",quitTerminal,"Exit the terminal."},
+    {"setDebug",setDebugLevel,"Set CSP debug level"},
+    //Common for CSP
     {"ping",ping,"Pings the chosen subsystem, sending a packet of data and timing the response"},
     {"listProcess",listProcess,"Lists the tasks and their status of the chosen subsystem"},
     {"uptime",uptime,"Prints how long a subsystem has been turned on for."},
     {"memfree",memFree,"Prints the free memory of a subsystem."},
     {"buffFree",buffFree,"Prints the number of csp buffers available on a subsystem."},
+    // CDH Commands
     {"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."},
     {"cancelTTT",cancelTTT,"Cancels a time tagged task."},
     {"downloadLogFile",downloadLogFile,"Download a log file from CDH."},
-    // CDH Commands
     {"cdhCheckTelemetry",cdhCheckTelemetry,"Checks what CDH telemetry is collected on CDH."},
     {"cdhGetTelemetry",cdhGetTelemetry,"Gets the latest CDH telemetry data from CDH."},
     {"cdhRequestTelemetry",cdhRequestTelemetry,"Tells CDH to generate new CDH telemetry."},
     {"cdhSetTime",cdhSetTime,"Updates the time on CDH."},
     {"cdhGetTime",cdhGetTime,"Gets the time on CDH."},
+    {"cdhFileList",cdhFileList,"Lists the files in CDH data memory."},
+    {"cdhUploadFw",cdhUploadFw,"Upload a firmware file to CDH."},
     // Payload Commands
     {"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},
@@ -246,3 +251,11 @@ char * getline_(void) {
     return linep;
 }
 
+void setDebugLevel(int argc, char** argv){
+
+    // switch(atoi(argv[0])){
+
+    //     case 0;
+    // }
+    // csp_debug_toggle_level()
+}

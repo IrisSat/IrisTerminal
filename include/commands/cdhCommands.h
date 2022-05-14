@@ -12,6 +12,8 @@ void checkTTT(int argc,char **argv);
 void cancelTTT(int argc,char **argv);
 void cdhSetTime(int argc, char **argv);
 void cdhGetTime(int argc, char **argv);
+void cdhFileList(int argc, char **argv);
+void cdhUploadFw(int argc, char **argv);
 
 uint8_t decodeLogFileNames(char * arg);
 
