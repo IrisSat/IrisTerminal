@@ -346,7 +346,7 @@ void cdhUploadFw(int argc, char **argv){
         Calendar_t now;
         getCalendarNow(&now);
         cmd.timestamp = now;
-        cmd.telem_id = CDH_LIST_FILES_CMD;
+        cmd.telem_id = CDH_FW_RX_FW_CMD;
         cmd.length = sizeof(Fw_metadata_t);; //We send an updated time.
         memcpy(cmd.data,&fw_info,sizeof(fw_info)); 
         sendCommand(&cmd,CDH_CSP_ADDRESS);

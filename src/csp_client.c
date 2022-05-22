@@ -74,6 +74,7 @@ int running = 1;
                         
                         case CDH_CSP_ADDRESS:{
                             cdhTelemetryHandler(&telem);
+                            break;
                         }
                         case PAYLOAD_CSP_ADDRESS:{
 
