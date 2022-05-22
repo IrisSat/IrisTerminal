@@ -14,6 +14,9 @@ void cdhSetTime(int argc, char **argv);
 void cdhGetTime(int argc, char **argv);
 void cdhFileList(int argc, char **argv);
 void cdhUploadFw(int argc, char **argv);
+void cdhGetFwState(int argc, char **argv);
+void cdhListFw(int argc, char **argv);
+void cdhSetFwState(int argc, char **argv);
 
 uint8_t decodeLogFileNames(char * arg);
 

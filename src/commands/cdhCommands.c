@@ -357,3 +357,81 @@ void cdhUploadFw(int argc, char **argv){
     END: 
         printf("done\n");
 }
+
+
+void cdhGetFwState(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_GET_STATE_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+
+void cdhListFw(int argc, char **argv){
+    
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_LIST_FW_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhSetFwState(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to set state of the fw update manager on CDH. \n");
+        printf("Valid Arguments: IDLE,RX_FW,PRE_VER,ARM,EXECUTE,EXECUTE_CONFIRM,POST_VER \n");
+        printf("It is recommended to check success using the cdhFwGetState after running this command. \n");
+        return;
+    }
+
+    if(argc != 2){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    uint8_t state_cmd;
+
+    if(!strcmp(argv[1],"IDLE")){
+        state_cmd = CDH_FW_IDLE_CMD;
+    }
+    else if(!strcmp(argv[1],"RX_FW")){
+        state_cmd = CDH_FW_RX_FW_CMD;
+    }    
+    else if(!strcmp(argv[1],"PRE_VER")){
+        state_cmd = CDH_FW_PRE_VER_CMD;
+    }
+    else if(!strcmp(argv[1],"ARM")){
+        state_cmd = CDH_FW_ARM_CMD;
+    }
+    else if(!strcmp(argv[1],"EXECUTE")){
+        state_cmd = CDH_FW_EXECUTE_CMD;
+    }
+    else if(!strcmp(argv[1],"EXECUTE_CONFIRM")){
+        state_cmd = CDH_FW_EXECUTE_CONFIRM_CMD;
+    }
+    else if(!strcmp(argv[1],"POST_VER")){
+        state_cmd = CDH_FW_POST_VER_CMD;
+    }
+    else{
+        printf("Invalid state: %s \n",argv[1]);
+        return;
+    }
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = state_cmd;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}

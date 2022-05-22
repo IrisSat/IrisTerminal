@@ -70,9 +70,8 @@ int running = 1;
                     
                     telemetryPacket_t telem;
                     unpackTelemetry(packet->data,&telem);
-                    
                     switch(csp_conn_src(conn)){
-
+                        
                         case CDH_CSP_ADDRESS:{
                             cdhTelemetryHandler(&telem);
                         }

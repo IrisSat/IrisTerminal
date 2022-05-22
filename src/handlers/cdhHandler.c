@@ -12,7 +12,6 @@ char * cdhFwStateTable[6] ={
 };
 
 void cdhTelemetryHandler(telemetryPacket_t* telem){
-
     switch(telem->telem_id){
 
         case CDH_MSG_ID:{

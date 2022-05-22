@@ -34,7 +34,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    52
+#define NUM_COMMANDS    55
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {"help", printHelp, "Prints the help message."},
@@ -57,6 +57,9 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {"cdhGetTime",cdhGetTime,"Gets the time on CDH."},
     {"cdhFileList",cdhFileList,"Lists the files in CDH data memory."},
     {"cdhUploadFw",cdhUploadFw,"Upload a firmware file to CDH."},
+    {"cdhGetFwState", cdhGetFwState, "Get the current state of the CDH firmware update manager."},
+    {"cdhSetFwState", cdhSetFwState, "Request to set the CDH firmware update manager to the desired state."},
+    {"cdhListFw",cdhListFw, "List the firmware files and their state."},
     // Payload Commands
     {"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},
@@ -139,7 +142,6 @@ int main(int argc, char **argv) {
                 break;
             }
         }
-
 
     }
 
