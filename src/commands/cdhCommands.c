@@ -31,13 +31,13 @@ const char * LogFileList[] =
 };
 
 typedef struct{
-    char filename[64];//Filename of the firmware.
+    uint8_t fileIndex; //Valid options are 0(GOLDEN image) or 1 (UPDATE image)
     uint32_t filesize;//Filesize in bytes. For use in receiving and as extra check.
     uint32_t checksum;//crc-32 full file checksum.
 
 }Fw_metadata_t;
-void checksum_file(uint32_t * out, FILE * in);//Out must be pointer to 32 bit int where result will go. In must be opened file, seek will be set back to start on function return.
 
+void checksum_file(uint32_t * out, FILE * in);//Out must be pointer to 32 bit int where result will go. In must be opened file, seek will be set back to start on function return.
 void cdhGetTelemetry(int argc, char **argv){}
 void cdhCheckTelemetry(int argc, char **argv){}
 void cdhRequestTelemetry(int argc, char **argv){}
@@ -265,31 +265,7 @@ int cmdRead(char *cmd,char *output, int outLen)
     
 }
 
-void checksum_file(uint32_t * out, FILE * in){
 
-    //Based on the libcrc example/test program.
-    uint32_t crc_32_val;
-    char ch;
-    unsigned char prev_byte;
-    fseek(in, 0, SEEK_SET);
-        if ( in != NULL ) {
-
-            while( ( ch=fgetc( in ) ) != EOF ) {
-
-
-                crc_32_val = update_crc_32(     crc_32_val,         (unsigned char) ch            );
-
-                prev_byte = (unsigned char) ch;
-            }
-
-            fseek(in, 0, SEEK_SET);
-        }
-    
-
-    crc_32_val        ^= 0xffffffffL;
-
-    *out = crc_32_val;
-}
 
 void cdhUploadFw(int argc, char **argv){
 
@@ -300,7 +276,7 @@ void cdhUploadFw(int argc, char **argv){
 
         printf("Sending fw to the cdh board...\n");
 
-        const int chunkSize = 250; //CAN MTU is 255? 
+        const int chunkSize = 150; //CAN MTU is 255? 
         char* fileName = argv[1];
         FILE * fwFile;
         fwFile = fopen(fileName,"rb");
@@ -313,10 +289,10 @@ void cdhUploadFw(int argc, char **argv){
         long fileSize_B= ftell(fwFile); // get current file pointer
         fseek(fwFile, 0, SEEK_SET); // seek back to beginning of file
 
-        double numChunks_dec = fileSize_B/chunkSize;
+        double numChunks_dec = (double)fileSize_B/(double)chunkSize;
         int numChunks = (int)ceil(numChunks_dec);
 
-        printf("Splitting the fw(%dkiB) into %d chunks of size %d B.\n",fileSize_B/1024,numChunks,chunkSize);
+        printf("Splitting the fw(%dkiB) into %d (%f) chunks of size %d B.\n",fileSize_B/1024,numChunks,numChunks_dec,chunkSize);
         // proceed with allocating memory and reading the file
 
         uint8_t* chunk;
@@ -327,12 +303,9 @@ void cdhUploadFw(int argc, char **argv){
 
         //Start by telling cdh fw_update_mgr to enter the "receiveing update" state, along with basic info...
         Fw_metadata_t fw_info;
-        printf("%s\n",argv[2]);
-        strcpy(fw_info.filename,argv[2]);
-
+        fw_info.fileIndex =atoi(argv[2]);
         fw_info.filesize = fileSize_B;
-        printf("Filename %s filesize %d\n",fw_info.filename,fw_info.filesize);
-
+        
         //Get checksum for file...
         uint32_t checksum;
         char cmd_str[128];
@@ -340,6 +313,7 @@ void cdhUploadFw(int argc, char **argv){
         printf("fw checksum: %0x\n",checksum);
         fw_info.checksum = checksum;
 
+        printf("Uploading file %s (%db) with checksum %0x to slot %d\n",fileName,fw_info.filesize,fw_info.checksum,fw_info.fileIndex);
         
         telemetryPacket_t cmd;
         //Set command timestamp to now.
@@ -348,8 +322,30 @@ void cdhUploadFw(int argc, char **argv){
         cmd.timestamp = now;
         cmd.telem_id = CDH_FW_RX_FW_CMD;
         cmd.length = sizeof(Fw_metadata_t);; //We send an updated time.
-        memcpy(cmd.data,&fw_info,sizeof(fw_info)); 
+        cmd.data = (uint8_t *)&fw_info;
         sendCommand(&cmd,CDH_CSP_ADDRESS);
+        csp_sleep_ms(1000);
+        
+        //Now we upload the file
+        for(int i=0; i< numChunks; i++){
+
+            int actual = fread(chunk,1,chunkSize,fwFile);
+
+            telemetryPacket_t cmd;
+            //Set command timestamp to now.
+            Calendar_t now;
+            getCalendarNow(&now);
+            cmd.timestamp = now;
+            cmd.telem_id = CDH_FW_PUT_DATA_CMD;
+            cmd.length = sizeof(uint8_t)*chunkSize; //We send an updated time.
+            cmd.data = chunk;
+            sendCommand(&cmd,CDH_CSP_ADDRESS);
+            if(i%500 ==0){
+                printf("Done chunk %d of %d\n",i,numChunks);
+                printf("Estimated time remainging: %f minutes \n",((double)numChunks-i)*.1/60);
+            }
+            csp_sleep_ms(100);
+        }
 
 
     }
@@ -434,4 +430,67 @@ void cdhSetFwState(int argc, char **argv){
     cmd.telem_id = state_cmd;
     cmd.length = 0; //We send an updated time.
     sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhChecksumFile(int argc, char **argv){
+
+    char name[128] = {0};
+    strcpy(name,argv[1]);
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_CHECKSUM_FILE_CMD;
+    cmd.length = strlen(name)+1; //We send an updated time.
+    cmd.data = name;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+
+}
+
+
+//Out must be pointer to 32 bit int where result will go. In must be opened file, seek will be set back to start on function return.
+void checksum_file(uint32_t * out, FILE * in){
+    //Based on the libcrc example/test program.
+    uint32_t crc_32_val = 0xffffffffL;;
+    char ch;
+    unsigned char prev_byte;
+    fseek(in, 0, SEEK_SET);
+        if ( in != NULL ) {
+
+            while( ( ch=fgetc( in ) ) != EOF ) {
+
+
+                crc_32_val = update_crc_32(     crc_32_val,         (unsigned char) ch            );
+
+                prev_byte = (unsigned char) ch;
+            }
+
+            fseek(in, 0, SEEK_SET);
+        }
+    
+
+    crc_32_val        ^= 0xffffffffL;
+
+    *out = crc_32_val;
+
+}
+
+void checksumFile(int argc, char ** argv){
+
+    char* fileName = argv[1];
+    FILE * File;
+    File = fopen(fileName,"rb");
+    if(File == NULL){
+        printf("Error opneing file %s\n",argv);
+        return;
+    }
+    //Get checksum for file...
+    uint32_t checksum;
+    char cmd_str[128];
+    checksum_file(&checksum,File);
+    printf("checksum: %0x\n",checksum);
+
 }

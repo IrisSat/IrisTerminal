@@ -42,12 +42,13 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    55
+#define NUM_COMMANDS    57
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {GENERAL_GRP,"help", printHelp, "Prints the help message."},
     {GENERAL_GRP,"quit",quitTerminal,"Exit the terminal."},
     {GENERAL_GRP,"setDebug",setDebugLevel,"Set CSP debug level"},
+    {GENERAL_GRP, "checksum", checksumFile,"Calculate the crc32 checksum for a file."},
     //Common for CSP
     {GENERAL_GRP,"ping",ping,"Pings the chosen subsystem, sending a packet of data and timing the response"},
     {GENERAL_GRP,"listProcess",listProcess,"Lists the tasks and their status of the chosen subsystem"},
@@ -68,6 +69,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {CDH_GRP,"cdhGetFwState", cdhGetFwState, "Get the current state of the CDH firmware update manager."},
     {CDH_GRP,"cdhSetFwState", cdhSetFwState, "Request to set the CDH firmware update manager to the desired state."},
     {CDH_GRP,"cdhListFw",cdhListFw, "List the firmware files and their state."},
+    {CDH_GRP, "cdhChecksumFile", cdhChecksumFile,"Calculate the checksum for a file."},
     // Payload Commands
     {PLD_GRP,"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {PLD_GRP,"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},
@@ -151,7 +153,7 @@ int main(int argc, char **argv) {
                 break;
             }
         }
-        if(!found){
+        if(!found && strcmp(argv_[0],"")){
             printf("Could not find command: %s\n",argv_[0]);
         }
 
@@ -292,9 +294,9 @@ char * getline_(void) {
 
 void setDebugLevel(int argc, char** argv){
 
-    // switch(atoi(argv[0])){
+    //  switch(atoi(argv[0])){
 
-    //     case 0;
-    // }
-    // csp_debug_toggle_level()
+    //      case 0
+    //  }
+     csp_debug_toggle_level(atoi(argv[1]));
 }

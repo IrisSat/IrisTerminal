@@ -17,6 +17,8 @@ void cdhUploadFw(int argc, char **argv);
 void cdhGetFwState(int argc, char **argv);
 void cdhListFw(int argc, char **argv);
 void cdhSetFwState(int argc, char **argv);
+void cdhChecksumFile(int argc, char **argv);
+void checksumFile(int argc, char **argv);
 
 uint8_t decodeLogFileNames(char * arg);
 

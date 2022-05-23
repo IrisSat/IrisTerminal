@@ -394,7 +394,7 @@ int startcsp(char * comPort,int baudRate){
     // csp_debug_toggle_level(CSP_PACKET);
     csp_debug_toggle_level(CSP_INFO);
 
-    int res = csp_buffer_init(100, 300);
+    int res = csp_buffer_init(100, 500);
     if(res != CSP_ERR_NONE){
         printf("ERROR");
         return -1;
