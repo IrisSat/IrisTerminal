@@ -459,12 +459,12 @@ void checksum_file(uint32_t * out, FILE * in){
     unsigned char prev_byte;
     fseek(in, 0, SEEK_SET);
         if ( in != NULL ) {
+            int count =0;
+            while( ( fread(&ch,1,1, in ) ) >0 ) {
 
-            while( ( ch=fgetc( in ) ) != EOF ) {
-
-
+                
                 crc_32_val = update_crc_32(     crc_32_val,         (unsigned char) ch            );
-
+                count ++;
                 prev_byte = (unsigned char) ch;
             }
 
