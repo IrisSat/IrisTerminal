@@ -337,7 +337,7 @@ void downloadImage(int argc, char **argv){
         cmd_data[1] = atoi(argv[2]);
         // cmd_data[9] = atoi(argv[2]);
         // cmd_data[10] = atoi(argv[3]);
-        memcpy(&cmd_data[2],&now,sizeof(Calendar_t));
+        memcpy(&cmd_data[5],&now,sizeof(Calendar_t));
 
 
         sendCommand(&cmd,CDH_CSP_ADDRESS);

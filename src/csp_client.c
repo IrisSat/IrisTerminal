@@ -179,6 +179,10 @@ int running = 1;
                             printf("POWER_GET_ECLIPSE_ID: %d\n",telem.data[0]);
                             break;
                         }
+                        case POWER_GET_BOOT_COUNT_ID:{
+                            printf("POWER_GET_BOOT_COUNT_ID: %d\n",telem.data[0]);
+                            break;
+                        }
 
                     }
                     printf("\nIris>");

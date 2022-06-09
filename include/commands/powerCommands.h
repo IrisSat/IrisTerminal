@@ -46,6 +46,7 @@ void powReadLoadCurrent(int argc, char **argv);
 void powReadMsbVoltage(int argc, char **argv);
 void powGetBatterySoc(int argc, char **argv);
 void powGetEclipse(int argc, char **argv);
+void powGetBootCount(int argc, char **argv);
 // Set methods
 void powSetLoadSwitch(int argc, char **argv);
 void powSetSolarSwitch(int argc, char **argv);
