@@ -290,6 +290,7 @@ void powGetEclipse(int argc, char **argv){
     }
 }
 void powGetBootCount(int argc, char **argv){
+    // printf("powGetBootCount command not complete\n");
     if(argc == 2){
         if(strcmp(argv[1],"--help") == 0){
             printf("powGetEclipse help:\n");
