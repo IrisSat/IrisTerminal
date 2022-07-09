@@ -11,7 +11,11 @@
 #include <csp/arch/csp_thread.h>
 #include "networkConfig.h"
 #include "cameraRegLists.h"
-
+const char * TemperatureChannels[] =
+{
+    "board",
+    "sp",
+};
 /*
 
 void functionTemplate(int argc, char **argv){
@@ -32,6 +36,32 @@ void functionTemplate(int argc, char **argv){
     }
 }
 */
+void pldReadTemp(int argc, char **argv){
+
+    if(argc == 2){
+        if(strcmp(argv[1],"--help") == 0){
+            printf("pldReadTemp help:\n");
+            printf("-Command format: pldReadTemp [channel]\n");
+            printf("-Possible arguments: 0-6\n");
+            return;
+        }
+        // telemetryPacket_t cmd = {0};
+        // sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+        
+        // if(strcmp(argv[2],"board") == 0)
+        // {
+        //     return;
+        // }
+        // // Send the TTT
+        // printf("Reading temperature channel %d\n",cmd_data[1]);
+        // sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+    } else {
+        printf("Invalid command (improper number of arguments - 1 required).\n");
+        printf("Enter the following command for valid modes: powReadTemp --help\n");
+    }
+
+}
 
 void pldTestCameraInit(int argc, char **argv){
     telemetryPacket_t cmd = {0};
@@ -370,47 +400,20 @@ void downloadImage(int argc, char **argv){
 }
 
 void pldCheckTelemetry(int argc,char **argv){}
-void pldRequestTelemetry(int argc,char **argv){telemetryPacket_t cmd;
-
-    //Set command timestamp to now.
-    Calendar_t now;
-    getCalendarNow(&now);
-    cmd.timestamp = now;
-
-    cmd.telem_id = PAYLOAD_POWER_GOOD_ID;
-
-    cmd.length = 0; //We send an updated time.
-telemetryPacket_t response;
-
-
-    int result = csp_transaction(2,PAYLOAD_CSP_ADDRESS,CSP_CMD_PORT,5000,&cmd,TELEM_HEADER_SIZE,&response,-1);
-    if(result<=0){
-        printf("csp transaction error: %d\n",result);
-    }
-    else{
-        //double* PowerGood=response.data;
-        //printf("Payload power good: %f\n",PowerGood);
-        printf("Payload power good: ???\n");
-       
+void pldRequestTelemetry(int argc,char **argv){
     
-
-    }
-    cmd.telem_id = PAYLOAD_BOARD_TEMP_ID;
-
-    cmd.length = 0; //We send an updated time.
-
-        result = csp_transaction(2,PAYLOAD_CSP_ADDRESS,CSP_CMD_PORT,5000,&cmd,TELEM_HEADER_SIZE,&response,-1);
-    if(result<=0){
-        printf("csp transaction error: %d\n",result);
-    }
-    else{
-        //double* boardtemp=response.data;
-        //printf("Payload board temperature: %d\n",boardtemp);
-        printf("Payload board temperature: ???\n");
-       
-    
-
-    }
+    printf("Issuing the following commands:\n");
+    printf("- PAYLOAD_POWER_GOOD_CMD\n");
+    printf("- PAYLOAD_BOARD_TEMP_CMD\n");
+    printf("- PAYLOAD_SAMPLE_TEMP_CMD\n");
+    telemetryPacket_t cmd = {0};
+    cmd.telem_id = PAYLOAD_POWER_GOOD_CMD;
+    cmd.length = 0;
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    cmd.telem_id = PAYLOAD_BOARD_TEMP_CMD;
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
+    cmd.telem_id = PAYLOAD_SAMPLE_TEMP_CMD;
+    sendCommand(&cmd,PAYLOAD_CSP_ADDRESS);
 }
 
 //Added by Ali{

@@ -4,3 +4,4 @@
 *.jpg
 *.bmp
 .vscode/settings.json
+*.json

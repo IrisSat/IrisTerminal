@@ -21,6 +21,48 @@ void CdhTelemetryHandler(csp_conn_t * conn, csp_packet_t * packet)
             printf("CDH_MSG_ID: %s\n",msg);
             break;
         }
+        
+        case POWER_READ_TEMP_ID:{
+            float temp;
+            memcpy(&temp,tm_pkt.data,4);
+            printf("POWER_READ_TEMP_ID: %.3f\n",temp);
+            // for(int i=0; i < 4; i++){
+            //     printf("[%d] - 0x%2X\n",i,telem.data[i]);
+            // }
+            break;
+        }
+        case POWER_READ_SOLAR_CURRENT_ID:{
+            float temp;
+            memcpy(&temp,tm_pkt.data,4);
+            printf("POWER_READ_SOLAR_CURRENT_ID: %.3f\n",temp);
+            break;
+        }
+        case POWER_READ_LOAD_CURRENT_ID:{
+            float temp;
+            memcpy(&temp,tm_pkt.data,4);
+            printf("POWER_READ_LOAD_CURRENT_ID: %.3f\n",temp);
+            break;
+        }
+        case POWER_READ_MSB_VOLTAGE_ID:{
+            float temp;
+            memcpy(&temp,tm_pkt.data,4);
+            printf("POWER_READ_MSB_VOLTAGE_ID: %.3f\n",temp);
+            break;
+        }
+        case POWER_GET_BATTERY_SOC_ID:{
+            float temp;
+            memcpy(&temp,tm_pkt.data,4);
+            printf("POWER_GET_BATTERY_SOC_ID: %.3f\n",temp);
+            break;
+        }
+        case POWER_GET_ECLIPSE_ID:{
+            printf("POWER_GET_ECLIPSE_ID: %d\n",tm_pkt.data[0]);
+            break;
+        }
+        case POWER_GET_BOOT_COUNT_ID:{
+            printf("POWER_GET_BOOT_COUNT_ID: %d\n",tm_pkt.data[0]);
+            break;
+        }
         default:{
             csp_service_handler(conn, packet);
             break;
@@ -33,7 +75,7 @@ void PayloadTelemetryHandler(csp_conn_t * conn, csp_packet_t * packet)
     // printf("Received telemetry packet from Payload.\n");
     telemetryPacket_t tm_pkt;
     unpackTelemetry(packet->data,&tm_pkt);
-    
+    printf("Payload telemetry ID: %d\n",tm_pkt.telem_id);    
     switch(tm_pkt.telem_id){
 
         case PAYLOAD_ACK:{
@@ -107,48 +149,8 @@ void PayloadTelemetryHandler(csp_conn_t * conn, csp_packet_t * packet)
             break;
         }
 
-        case POWER_READ_TEMP_ID:{
-            float temp;
-            memcpy(&temp,tm_pkt.data,4);
-            printf("POWER_READ_TEMP_ID: %.3f\n",temp);
-            // for(int i=0; i < 4; i++){
-            //     printf("[%d] - 0x%2X\n",i,telem.data[i]);
-            // }
-            break;
-        }
-        case POWER_READ_SOLAR_CURRENT_ID:{
-            float temp;
-            memcpy(&temp,tm_pkt.data,4);
-            printf("POWER_READ_SOLAR_CURRENT_ID: %.3f\n",temp);
-            break;
-        }
-        case POWER_READ_LOAD_CURRENT_ID:{
-            float temp;
-            memcpy(&temp,tm_pkt.data,4);
-            printf("POWER_READ_LOAD_CURRENT_ID: %.3f\n",temp);
-            break;
-        }
-        case POWER_READ_MSB_VOLTAGE_ID:{
-            float temp;
-            memcpy(&temp,tm_pkt.data,4);
-            printf("POWER_READ_MSB_VOLTAGE_ID: %.3f\n",temp);
-            break;
-        }
-        case POWER_GET_BATTERY_SOC_ID:{
-            float temp;
-            memcpy(&temp,tm_pkt.data,4);
-            printf("POWER_GET_BATTERY_SOC_ID: %.3f\n",temp);
-            break;
-        }
-        case POWER_GET_ECLIPSE_ID:{
-            printf("POWER_GET_ECLIPSE_ID: %d\n",tm_pkt.data[0]);
-            break;
-        }
-        case POWER_GET_BOOT_COUNT_ID:{
-            printf("POWER_GET_BOOT_COUNT_ID: %d\n",tm_pkt.data[0]);
-            break;
-        }
         default:{
+            printf("Payload tm_id not identified: %d\n",tm_pkt.telem_id);
             csp_service_handler(conn, packet);
             break;
         }
