@@ -42,7 +42,7 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    57
+#define NUM_COMMANDS    60
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {GENERAL_GRP,"help", printHelp, "Prints the help message."},
@@ -69,7 +69,10 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {CDH_GRP,"cdhGetFwState", cdhGetFwState, "Get the current state of the CDH firmware update manager."},
     {CDH_GRP,"cdhSetFwState", cdhSetFwState, "Request to set the CDH firmware update manager to the desired state."},
     {CDH_GRP,"cdhListFw",cdhListFw, "List the firmware files and their state."},
-    {CDH_GRP, "cdhChecksumFile", cdhChecksumFile,"Calculate the checksum for a file."},
+    {CDH_GRP,"cdhChecksumFile", cdhChecksumFile,"Calculate the checksum for a file on the cdh data memory."},
+    {CDH_GRP,"cdhMvFile", cdhMvFile, "Move a file on the cdh data memory." },
+    {CDH_GRP,"cdhRmFile", cdhRmFile, "Delete a file on the cdh data memory." },
+    {CDH_GRP,"cdhCpFile", cdhCpFile, "Copy a file on the cdh data memory." },
     // Payload Commands
     {PLD_GRP,"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {PLD_GRP,"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},

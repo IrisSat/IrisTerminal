@@ -434,7 +434,12 @@ void cdhSetFwState(int argc, char **argv){
 
 void cdhChecksumFile(int argc, char **argv){
 
-    char name[128] = {0};
+    if(argc != 2){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char name[64] = {0};
     strcpy(name,argv[1]);
 
     telemetryPacket_t cmd;
@@ -493,4 +498,84 @@ void checksumFile(int argc, char ** argv){
     checksum_file(&checksum,File);
     printf("checksum: %0x\n",checksum);
 
+}
+
+void cdhMvFile(int argc, char **argv){
+
+    if(argc != 3){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char oldPath[64] = {0};
+    char newPath[64] = {0};
+    strcpy(oldPath,argv[1]);
+    strcpy(newPath,argv[2]);
+
+    uint8_t databuf[130] = {0}; //Max 2 64b paths plus 2 bytes giving the length of each path.
+    databuf[0] = strlen(oldPath)+1;
+    databuf[1] = strlen(newPath)+1;
+    strncpy(&databuf[2],oldPath,64);
+    strncpy(&databuf[2+databuf[0]],newPath,64);
+
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_MV_FILE_CMD;
+    cmd.length = 2 + strlen(oldPath)+1 + strlen(newPath)+1; //We send an updated time.
+    cmd.data = databuf;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+void cdhRmFile(int argc, char **argv){
+
+    if(argc != 2){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char name[64] = {0};
+    strcpy(name,argv[1]);
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_RM_FILE_CMD;
+    cmd.length = strlen(name)+1; //We send an updated time.
+    cmd.data = name;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+void cdhCpFile(int argc, char **argv){
+
+    if(argc != 3){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char oldPath[64] = {0};
+    char newPath[64] = {0};
+    strcpy(oldPath,argv[1]);
+    strcpy(newPath,argv[2]);
+
+    uint8_t databuf[130] = {0}; //Max 2 64b paths plus 2 bytes giving the length of each path.
+    databuf[0] = strlen(oldPath)+1;
+    databuf[1] = strlen(newPath)+1;
+    strncpy(&databuf[2],oldPath,64);
+    strncpy(&databuf[2+databuf[0]],newPath,64);
+
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_CP_FILE_CMD;
+    cmd.length = 2 + strlen(oldPath)+1 + strlen(newPath)+1; //We send an updated time.
+    cmd.data = databuf;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
 }
