@@ -42,7 +42,9 @@ typedef struct{
 }cmd_t;
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
-#define NUM_COMMANDS    60
+
+#define NUM_COMMANDS    65
+
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
     {GENERAL_GRP,"help", printHelp, "Prints the help message."},
@@ -56,7 +58,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {GENERAL_GRP,"memfree",memFree,"Prints the free memory of a subsystem."},
     {GENERAL_GRP,"buffFree",buffFree,"Prints the number of csp buffers available on a subsystem."},
     // CDH Commands
-    {CDH_GRP,"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."},
+    {CDH_GRP,"scheduleTTT",scheduleTTT,"Schedules a new time tagged task."}, //10
     {CDH_GRP,"cancelTTT",cancelTTT,"Cancels a time tagged task."},
     {CDH_GRP,"downloadLogFile",downloadLogFile,"Download a log file from CDH."},
     {CDH_GRP,"cdhCheckTelemetry",cdhCheckTelemetry,"Checks what CDH telemetry is collected on CDH."},
@@ -66,7 +68,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {CDH_GRP,"cdhGetTime",cdhGetTime,"Gets the time on CDH."},
     {CDH_GRP,"cdhFileList",cdhFileList,"Lists the files in CDH data memory."},
     {CDH_GRP,"cdhUploadFw",cdhUploadFw,"Upload a firmware file to CDH."},
-    {CDH_GRP,"cdhGetFwState", cdhGetFwState, "Get the current state of the CDH firmware update manager."},
+    {CDH_GRP,"cdhGetFwState", cdhGetFwState, "Get the current state of the CDH firmware update manager."}, //20
     {CDH_GRP,"cdhSetFwState", cdhSetFwState, "Request to set the CDH firmware update manager to the desired state."},
     {CDH_GRP,"cdhListFw",cdhListFw, "List the firmware files and their state."},
     {CDH_GRP,"cdhChecksumFile", cdhChecksumFile,"Calculate the checksum for a file on the cdh data memory."},
@@ -77,7 +79,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {PLD_GRP,"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {PLD_GRP,"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},
     {PLD_GRP,"pldRequestTelemetry",pldRequestTelemetry,"Tells CDH to request new telemtry from payload."},
-    {PLD_GRP,"pldSendImage",pldSendImage,"Sends an image to the payload subsystem."},
+    {PLD_GRP,"pldSendImage",pldSendImage,"Sends an image to the payload subsystem."},//30
     {PLD_GRP,"downloadImage",downloadImage,"Gets an image from payload."},
     {PLD_GRP,"deleteImage",deleteImage,"Deletes a specified payload image."},
     {PLD_GRP,"turnOnCamera1",turnoncamera1,"Turn on camera 1."},
@@ -87,7 +89,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {PLD_GRP,"resetCamera1",resetcamera1,"Reset camera 1."},
     {PLD_GRP,"resetCamera2",resetcamera2,"Reset camera 2."},
     {PLD_GRP,"pldCamHs",pldCameraHandshake,"Do a handshake with one of the two cameras."},
-    {PLD_GRP,"pldCamInit",pldCameraSensorInit,"Initialize one of the two cameras."},
+    {PLD_GRP,"pldCamInit",pldCameraSensorInit,"Initialize one of the two cameras."},//40
     {PLD_GRP,"pldCamTxAddr",pldCameraSetI2cWriteAddress,"Sets Payload camera I2C write address."},
     {PLD_GRP,"pldCamRxAddr",pldCameraSetI2cReadAddress,"Sets Payload camera I2C read address."},
     {PLD_GRP,"pldCamTxData",pldCameraI2cTransmit,"Transmit I2C data to one of the two cameras."},
@@ -98,7 +100,7 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {PLD_GRP,"icc1",takeimagecamera1,"Take image with camera 1."},
     {PLD_GRP,"icc2",takeimagecamera2,"Take image with camera 2."},
     {PLD_GRP,"pldFileList",pldFileList,"Gets a list of the files stored in Payload flash."},
-    {PLD_GRP,"pldMountFs",pldMountFS,"Mount Payload filesystem."},
+    {PLD_GRP,"pldMountFs",pldMountFS,"Mount Payload filesystem."},//50
     {PLD_GRP,"pldUnmountFs",pldUnmountFS,"Unmount Payload filesystem."},
     {PLD_GRP,"pldRestartFs",pldRestartFS,"Restart Payload filesystem."},
     // Power Commands
@@ -109,6 +111,12 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {PWR_GRP,"powSetLoadSwitch",powSetLoadSwitch,"Power - Set load switch on/off."},
     {PWR_GRP,"powSetSolarSwitch",powReadSolarArrayCurrent,"Power - Set solar array switch on/off."},
     {PWR_GRP,"powSetMode",powSetMode,"Power - Set power mode."},
+    {PWR_GRP,"powGetSoc",powGetBatterySoc,"Power - Get battery state of charge."}, //60
+    {PWR_GRP,"powGetEclipse",powGetEclipse,"Power - Get state of eclipse."},
+    {PWR_GRP,"powGetBootCount",powGetBootCount,"Power - Get boot count."},
+    {PWR_GRP,"powSetSoc",powAitSetBatterySoc,"Power AIT - Set battery state of charge."},
+    {PWR_GRP,"powSetEclipse",powAitSetEclipse,"Power AIT - Set state of eclipse."},
+
     // Comms Commands
     {COMS_GRP,"sendCommsMessage",commsSendCSPMessage,"Send COMMS a message."},
 };

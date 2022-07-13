@@ -19,6 +19,8 @@
         "payloadcommands.h": "c",
         "csp_if_can.h": "c",
         "powercommands.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "math.h": "c",
+        "telemetry_handlers.h": "c"
     }
 }

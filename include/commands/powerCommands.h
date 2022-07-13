@@ -39,15 +39,21 @@ typedef enum
 } PowerMode_t;
 
 
-
+// Get methods
 void powReadTempChannel(int argc, char **argv);
 void powReadSolarArrayCurrent(int argc, char **argv);
 void powReadLoadCurrent(int argc, char **argv);
 void powReadMsbVoltage(int argc, char **argv);
+void powGetBatterySoc(int argc, char **argv);
+void powGetEclipse(int argc, char **argv);
+void powGetBootCount(int argc, char **argv);
+// Set methods
 void powSetLoadSwitch(int argc, char **argv);
 void powSetSolarSwitch(int argc, char **argv);
 void powSetMode(int argc, char **argv);
-
+void powAitSetBatterySoc(int argc, char **argv);
+void powAitSetEclipse(int argc, char **argv);
+// Helper methods
 int decodeLoadCurrentChannel(char * arg);
 int decodeLoadSwitchNumber(char * arg);
 int decodePowerModes(char * arg);
