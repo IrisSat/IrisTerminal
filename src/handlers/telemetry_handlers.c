@@ -10,6 +10,15 @@ int prevDownloadPercentage = 100;
 int MAX_IMAGE_CHUNKS = 2700;
 int IMAGE_PERCENT_DELTA = 2;
 
+char * cdhFwStateTable[6] ={
+    "IDLE",
+    "RX_FW",
+    "PRE_VERIFY",
+    "ARMED",
+    "UPDATE",
+    "POST_VERIFY",
+};
+
 void CdhTelemetryHandler(csp_conn_t * conn, csp_packet_t * packet)
 {
     telemetryPacket_t tm_pkt;
@@ -21,7 +30,13 @@ void CdhTelemetryHandler(csp_conn_t * conn, csp_packet_t * packet)
             printf("CDH_MSG_ID: %s\n",msg);
             break;
         }
-        
+        case CDH_FW_STATE_ID:{
+
+            uint8_t state = tm_pkt.data[0];
+            char * stateName = cdhFwStateTable[state];
+            printf("CDH_FW_STATE: %d (%s)\n",state,stateName);
+            break;
+        }
         case POWER_READ_TEMP_ID:{
             float temp;
             memcpy(&temp,tm_pkt.data,4);

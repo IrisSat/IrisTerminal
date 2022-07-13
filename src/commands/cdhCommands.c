@@ -12,6 +12,8 @@
 #include "networkConfig.h"
 #include "telemetry.h"
 #include <time.h>
+#include <checksum.h>
+
 
 typedef enum
 {
@@ -28,6 +30,14 @@ const char * LogFileList[] =
     "cdhError"
 };
 
+typedef struct{
+    uint8_t fileIndex; //Valid options are 0(GOLDEN image) or 1 (UPDATE image)
+    uint32_t filesize;//Filesize in bytes. For use in receiving and as extra check.
+    uint32_t checksum;//crc-32 full file checksum.
+
+}Fw_metadata_t;
+
+void checksum_file(uint32_t * out, FILE * in);//Out must be pointer to 32 bit int where result will go. In must be opened file, seek will be set back to start on function return.
 void cdhGetTelemetry(int argc, char **argv){}
 void cdhCheckTelemetry(int argc, char **argv){}
 void cdhRequestTelemetry(int argc, char **argv){}
@@ -228,3 +238,344 @@ void cdhGetTime(int argc, char **argv){
     }
 }
 
+void cdhFileList(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_LIST_FILES_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+int cmdRead(char *cmd,char *output, int outLen)
+{
+    FILE *p = popen(cmd, "r");
+    if (p == NULL) return 0;
+    char buf[256]={0};
+    int left = outLen;
+    while(fgets(buf,256,p) != NULL){
+
+        strncpy(output,buf,left);
+        left= left-strlen(buf);
+    }
+    pclose(p);
+    
+}
+
+
+
+void cdhUploadFw(int argc, char **argv){
+
+    if(argc != 3){
+        printf("incorrect parameteres...");
+    }
+    else{
+
+        printf("Sending fw to the cdh board...\n");
+
+        const int chunkSize = 150; //CAN MTU is 255? 
+        char* fileName = argv[1];
+        FILE * fwFile;
+        fwFile = fopen(fileName,"rb");
+        if(fwFile == NULL){
+            printf("Error opneing file %s\n",argv);
+            goto END;
+        }
+
+        fseek(fwFile, 0, SEEK_END); // seek to end of file
+        long fileSize_B= ftell(fwFile); // get current file pointer
+        fseek(fwFile, 0, SEEK_SET); // seek back to beginning of file
+
+        double numChunks_dec = (double)fileSize_B/(double)chunkSize;
+        int numChunks = (int)ceil(numChunks_dec);
+
+        printf("Splitting the fw(%dkiB) into %d (%f) chunks of size %d B.\n",fileSize_B/1024,numChunks,numChunks_dec,chunkSize);
+        // proceed with allocating memory and reading the file
+
+        uint8_t* chunk;
+        chunk = malloc(chunkSize);
+        if(chunk == NULL){
+            printf("Error allocating memory... Download some more RAM!\n");
+        }
+
+        //Start by telling cdh fw_update_mgr to enter the "receiveing update" state, along with basic info...
+        Fw_metadata_t fw_info;
+        fw_info.fileIndex =atoi(argv[2]);
+        fw_info.filesize = fileSize_B;
+        
+        //Get checksum for file...
+        uint32_t checksum;
+        char cmd_str[128];
+        checksum_file(&checksum,fwFile);
+        printf("fw checksum: %0x\n",checksum);
+        fw_info.checksum = checksum;
+
+        printf("Uploading file %s (%db) with checksum %0x to slot %d\n",fileName,fw_info.filesize,fw_info.checksum,fw_info.fileIndex);
+        
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        getCalendarNow(&now);
+        cmd.timestamp = now;
+        cmd.telem_id = CDH_FW_RX_FW_CMD;
+        cmd.length = sizeof(Fw_metadata_t);; //We send an updated time.
+        cmd.data = (uint8_t *)&fw_info;
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+        csp_sleep_ms(1000);
+        
+        //Now we upload the file
+        for(int i=0; i< numChunks; i++){
+
+            int actual = fread(chunk,1,chunkSize,fwFile);
+
+            telemetryPacket_t cmd;
+            //Set command timestamp to now.
+            Calendar_t now;
+            getCalendarNow(&now);
+            cmd.timestamp = now;
+            cmd.telem_id = CDH_FW_PUT_DATA_CMD;
+            cmd.length = sizeof(uint8_t)*chunkSize; //We send an updated time.
+            cmd.data = chunk;
+            sendCommand(&cmd,CDH_CSP_ADDRESS);
+            if(i%500 ==0){
+                printf("Done chunk %d of %d\n",i,numChunks);
+                printf("Estimated time remainging: %f minutes \n",((double)numChunks-i)*.1/60);
+            }
+            csp_sleep_ms(100);
+        }
+
+
+    }
+
+    END: 
+        printf("done\n");
+}
+
+
+void cdhGetFwState(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_GET_STATE_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+
+void cdhListFw(int argc, char **argv){
+    
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_LIST_FW_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhSetFwState(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to set state of the fw update manager on CDH. \n");
+        printf("Valid Arguments: IDLE,RX_FW,PRE_VER,ARM,EXECUTE,EXECUTE_CONFIRM,POST_VER \n");
+        printf("It is recommended to check success using the cdhFwGetState after running this command. \n");
+        return;
+    }
+
+    if(argc != 2){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    uint8_t state_cmd;
+
+    if(!strcmp(argv[1],"IDLE")){
+        state_cmd = CDH_FW_IDLE_CMD;
+    }
+    else if(!strcmp(argv[1],"RX_FW")){
+        state_cmd = CDH_FW_RX_FW_CMD;
+    }    
+    else if(!strcmp(argv[1],"PRE_VER")){
+        state_cmd = CDH_FW_PRE_VER_CMD;
+    }
+    else if(!strcmp(argv[1],"ARM")){
+        state_cmd = CDH_FW_ARM_CMD;
+    }
+    else if(!strcmp(argv[1],"EXECUTE")){
+        state_cmd = CDH_FW_EXECUTE_CMD;
+    }
+    else if(!strcmp(argv[1],"EXECUTE_CONFIRM")){
+        state_cmd = CDH_FW_EXECUTE_CONFIRM_CMD;
+    }
+    else if(!strcmp(argv[1],"POST_VER")){
+        state_cmd = CDH_FW_POST_VER_CMD;
+    }
+    else{
+        printf("Invalid state: %s \n",argv[1]);
+        return;
+    }
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = state_cmd;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhChecksumFile(int argc, char **argv){
+
+    if(argc != 2){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char name[64] = {0};
+    strcpy(name,argv[1]);
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_CHECKSUM_FILE_CMD;
+    cmd.length = strlen(name)+1; //We send an updated time.
+    cmd.data = name;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+
+}
+
+
+//Out must be pointer to 32 bit int where result will go. In must be opened file, seek will be set back to start on function return.
+void checksum_file(uint32_t * out, FILE * in){
+    //Based on the libcrc example/test program.
+    uint32_t crc_32_val = 0xffffffffL;;
+    char ch;
+    unsigned char prev_byte;
+    fseek(in, 0, SEEK_SET);
+        if ( in != NULL ) {
+            int count =0;
+            while( ( fread(&ch,1,1, in ) ) >0 ) {
+
+                
+                crc_32_val = update_crc_32(     crc_32_val,         (unsigned char) ch            );
+                count ++;
+                prev_byte = (unsigned char) ch;
+            }
+
+            fseek(in, 0, SEEK_SET);
+        }
+    
+
+    crc_32_val        ^= 0xffffffffL;
+
+    *out = crc_32_val;
+
+}
+
+void checksumFile(int argc, char ** argv){
+
+    char* fileName = argv[1];
+    FILE * File;
+    File = fopen(fileName,"rb");
+    if(File == NULL){
+        printf("Error opneing file %s\n",argv);
+        return;
+    }
+    //Get checksum for file...
+    uint32_t checksum;
+    char cmd_str[128];
+    checksum_file(&checksum,File);
+    printf("checksum: %0x\n",checksum);
+
+}
+
+void cdhMvFile(int argc, char **argv){
+
+    if(argc != 3){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char oldPath[64] = {0};
+    char newPath[64] = {0};
+    strcpy(oldPath,argv[1]);
+    strcpy(newPath,argv[2]);
+
+    uint8_t databuf[130] = {0}; //Max 2 64b paths plus 2 bytes giving the length of each path.
+    databuf[0] = strlen(oldPath)+1;
+    databuf[1] = strlen(newPath)+1;
+    strncpy(&databuf[2],oldPath,64);
+    strncpy(&databuf[2+databuf[0]],newPath,64);
+
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_MV_FILE_CMD;
+    cmd.length = 2 + strlen(oldPath)+1 + strlen(newPath)+1; //We send an updated time.
+    cmd.data = databuf;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+void cdhRmFile(int argc, char **argv){
+
+    if(argc != 2){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char name[64] = {0};
+    strcpy(name,argv[1]);
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_RM_FILE_CMD;
+    cmd.length = strlen(name)+1; //We send an updated time.
+    cmd.data = name;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+void cdhCpFile(int argc, char **argv){
+
+    if(argc != 3){
+        printf("Wrong number arguments...\n");
+        return;
+    }
+
+    char oldPath[64] = {0};
+    char newPath[64] = {0};
+    strcpy(oldPath,argv[1]);
+    strcpy(newPath,argv[2]);
+
+    uint8_t databuf[130] = {0}; //Max 2 64b paths plus 2 bytes giving the length of each path.
+    databuf[0] = strlen(oldPath)+1;
+    databuf[1] = strlen(newPath)+1;
+    strncpy(&databuf[2],oldPath,64);
+    strncpy(&databuf[2+databuf[0]],newPath,64);
+
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_CP_FILE_CMD;
+    cmd.length = 2 + strlen(oldPath)+1 + strlen(newPath)+1; //We send an updated time.
+    cmd.data = databuf;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}

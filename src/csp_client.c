@@ -13,6 +13,7 @@
 
 #include "telemetry_handlers.h"
 
+
 #define PORT 10
 #define MY_ADDRESS 9
 #define CDH_ADDRESS 0
@@ -280,10 +281,10 @@ int csp_transaction_2port(uint8_t prio, uint8_t dest, uint8_t port, uint8_t rx_p
 }
 
 int startcsp(char * comPort,int baudRate){
-    csp_debug_toggle_level(CSP_PACKET);
+    // csp_debug_toggle_level(CSP_PACKET);
     csp_debug_toggle_level(CSP_INFO);
 
-    int res = csp_buffer_init(100, 300);
+    int res = csp_buffer_init(100, 500);
     if(res != CSP_ERR_NONE){
         printf("ERROR");
         return -1;
