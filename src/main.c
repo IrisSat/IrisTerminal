@@ -14,9 +14,12 @@
 #include "cdhCommands.h"
 #include "powerCommands.h"
 
+
+
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
+
 
 //Help groups/filter, 0 is all.
 #define GENERAL_GRP 1
@@ -43,7 +46,7 @@ typedef struct{
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
 
-#define NUM_COMMANDS    65
+#define NUM_COMMANDS    74
 
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
@@ -75,6 +78,15 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {CDH_GRP,"cdhMvFile", cdhMvFile, "Move a file on the cdh data memory." },
     {CDH_GRP,"cdhRmFile", cdhRmFile, "Delete a file on the cdh data memory." },
     {CDH_GRP,"cdhCpFile", cdhCpFile, "Copy a file on the cdh data memory." },
+    {CDH_GRP,"cdhChecksumFlash",cdhChecksumFlash,"Run checksum on flash memory area."},
+    {CDH_GRP,"cdhCopyToFlash", cdhCopyToProgFlash, "Copy file to program flash."},
+    {CDH_GRP,"cdhGetSwVersion", cdhGetSwVersion, "Get the software version from CDH."},
+    {CDH_GRP,"cdhGetDesignVersion", cdhGetDesignVersion, "Get the design version from CDH."},
+    {CDH_GRP, "cdhGetFwSpiDir", cdhGetFwSpiDir, "Get the firmware update(IAP) spi dir."},
+    {CDH_GRP, "cdhGetFsFreeSpace",cdhFsGetFreeSpace, "Get remaining space in filesystem, in bytes."},
+    {CDH_GRP, "cdhFwUpdateSpiDir", cdhFwUpdateSpiDir, "Update the fw design version in the spi dir."},
+    {CDH_GRP, "cdhFwCreateSpiDir", cdhFwCreateSpiDir, "Create the spi dir for fw update, specify whole file."},
+    {CDH_GRP, "cdhWriteProgFlash", cdhWriteProgFlash, "Write a fiel to the cdh proigram flash."},
     // Payload Commands
     {PLD_GRP,"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {PLD_GRP,"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},
@@ -151,8 +163,11 @@ int main(int argc, char **argv) {
     while(1) {
         //CMD line loop...
 
+        
         printf("Iris>");
         cmd = getline_();
+
+
         makeargs(cmd,&argc_,&argv_);
         int found = 0;
         for(int i=0; i<NUM_COMMANDS; i++){

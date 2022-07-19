@@ -579,3 +579,273 @@ void cdhCpFile(int argc, char **argv){
     cmd.data = databuf;
     sendCommand(&cmd,CDH_CSP_ADDRESS);
 }
+
+void cdhCopyToProgFlash(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to copy a file into \n");
+        printf("Usage: cdhCopyToProgFlash <filename> <address> \n");
+        printf("    address: Specify in HEX with 0x prefix!\n");
+        return;
+    }
+
+    if(argc != 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    char* endptr;
+    uint32_t address = strtol(argv[2],&endptr,0);
+
+    uint8_t databuf[sizeof(uint32_t)+64];
+    memcpy(databuf,&address,sizeof(uint32_t));
+    strcpy(&databuf[sizeof(uint32_t)],argv[1]);
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_CP_TO_PGRM_FLASH_CMD;
+    cmd.length = sizeof(uint32_t)+strlen(argv[1]); //We send an updated time.
+    cmd.data = databuf;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+void cdhChecksumFlash(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to get the checksum for an area of the program flash. i.e. checksum the firmware in program flash.\n");
+        printf("Usage: cdhChecksumFlash <address> <length> \n");
+        printf("    address: Start address of area. Specify in HEX with 0x prefix!\n");
+        printf("    length: Number of bytes in area. Specify in decimal.\n");
+        return;
+    }
+
+    if(argc != 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+    
+    char* endptr;
+    uint32_t address = strtol(argv[1],&endptr,0);
+    uint32_t size = atoi(argv[2]);
+
+    uint8_t databuf[sizeof(uint32_t)*2];
+    memcpy(databuf,&address,sizeof(uint32_t));
+    memcpy(&databuf[sizeof(uint32_t)],&size,sizeof(uint32_t));
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_CHECKSUM_PGRM_FLASH_CMD;
+    cmd.length = sizeof(uint32_t)*2; //We send an updated time.
+    cmd.data = databuf;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhGetSwVersion(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_GET_SW_VER_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+void cdhGetDesignVersion(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_GET_DES_VER_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+void cdhGetFwSpiDir(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_GET_SPI_DIR_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhFsGetFreeSpace(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_GET_FS_FREE_SPACE_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhFwUpdateSpiDir(int argc, char **argv){
+
+    if(argc != 2){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    uint8_t design_ver = atoi(argv[1]);
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_UPDATE_SPI_DIR_CMD;
+    cmd.length = 1; //We send an updated time.
+    cmd.data = &design_ver;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+void cdhFwCreateSpiDir(int argc, char **argv){
+    
+    if(strcmp(argv[1],"help") ==0){
+            printf("This command can be used to set the spi dir on the program flash.\n");
+            printf("Usage: cdhFwCreateSpiDir <numbytes> <bytes> \n");
+            printf("    numbytes: number of bytes in the spi dir file.\n");
+            printf("    bytes: type out each byte using 0x prefix\n");
+            return;
+        }
+
+    if(argc < 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+    uint8_t numbytes = atoi(argv[1]);
+    uint8_t * data = malloc(numbytes+1);
+
+    data[0] = numbytes;
+    for(int i=0; i< numbytes;i++){
+        char* endptr;
+        uint8_t byte = strtol(argv[2+i],&endptr,0);
+        data[1+i] = byte;
+    }
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_CREATE_SPI_DIR_CMD;
+    cmd.length = numbytes+1; //We send an updated time.
+    cmd.data = data;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhWriteProgFlash(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to write data to the program flash.\n");
+        printf("Usage: cdhWriteProgFlash <file> <location> \n");
+        printf("    filename: file on local pc to upload to cdh.\n");
+        printf("    location: start address in hex using 0x prefix\n");
+        return;
+    }
+
+    if(argc != 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    char * endptr; //don't care about this ever...
+    uint32_t address = strtol(argv[2],&endptr,0);
+
+    const int chunkSize = 150; //CAN MTU is 255? 
+    char* fileName = argv[1];
+    FILE * fp;
+    fp = fopen(fileName,"rb");
+    if(fp == NULL){
+        printf("Error opneing file %s\n",argv);
+        return;
+    }
+
+    fseek(fp, 0, SEEK_END); // seek to end of file
+    long fileSize_B= ftell(fp); // get current file pointer
+    fseek(fp, 0, SEEK_SET); // seek back to beginning of file
+
+    double numChunks_dec = (double)fileSize_B/(double)chunkSize;
+    int numChunks = (int)ceil(numChunks_dec);
+
+    printf("Splitting the fw(%dkiB) into %d (%f) chunks of size %d B.\n",fileSize_B/1024,numChunks,numChunks_dec,chunkSize);
+    // proceed with allocating memory and reading the file
+
+    uint8_t* chunk;
+    chunk = malloc(chunkSize+ sizeof(uint32_t));
+    if(chunk == NULL){
+        printf("Error allocating memory... Download some more RAM!\n");
+    }
+
+        //Now we upload the file
+    for(int i=0; i< numChunks; i++){
+
+        int actual = fread(&chunk[sizeof(uint32_t)],1,chunkSize,fp);
+        memcpy(&chunk[0],&address,sizeof(uint32_t));
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        getCalendarNow(&now);
+        cmd.timestamp = now;
+        cmd.telem_id = CDH_WRITE_PROG_FLASH_CMD;
+        cmd.length = sizeof(uint8_t)*chunkSize+sizeof(uint32_t); //We send an updated time.
+        cmd.data = chunk;
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+        if(i%500 ==0){
+            printf("Done chunk %d of %d\n",i,numChunks);
+            printf("Estimated time remainging: %f minutes \n",((double)numChunks-i)*.1/60);
+        }
+        csp_sleep_ms(100);
+        memset(chunk,0,chunkSize+sizeof(uint32_t));
+        address += chunkSize;
+    }
+    
+}
+
+void cdhEraseProgFlash(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to erase data from the program flash.\n");
+        printf("Usage: cdhEraseProgFlash <addr> <num_blocks> \n");
+        printf("    addr: start adress to earse from, specified in hex, 0x prefix. Should generally align with erase size (4096 / 0x1000).\n");
+        printf("    num_blocks: number of blocks to erase\n");
+        return;
+    }
+
+    if(argc != 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    char * endptr; //don't care about this ever...
+    uint32_t address = strtol(argv[1],&endptr,0);
+    uint32_t blocks = atoi(argv[2]);
+
+    uint8_t data[sizeof(uint32_t)*2];
+    memcpy(&data[0],&address,sizeof(uint32_t));   
+    memcpy(&data[sizeof(uint32_t)],&blocks,sizeof(uint32_t));   
+        
+        telemetryPacket_t cmd;
+        //Set command timestamp to now.
+        Calendar_t now;
+        getCalendarNow(&now);
+        cmd.timestamp = now;
+        cmd.telem_id = CDH_ERASE_PROG_FLASH_CMD;
+        cmd.length = 2*sizeof(uint32_t); //We send an updated time.
+        cmd.data = data;
+        sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
