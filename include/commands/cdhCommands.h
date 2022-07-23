@@ -22,7 +22,24 @@ void checksumFile(int argc, char **argv);
 void cdhMvFile(int argc, char **argv);
 void cdhRmFile(int argc, char **argv);
 void cdhCpFile(int argc, char **argv);
-
+void cdhCopyToProgFlash(int argc, char **argv);
+void cdhChecksumFlash(int argc, char **argv);
+void cdhGetSwVersion(int argc, char **argv);
+void cdhGetDesignVersion(int argc, char **argv);
+void cdhGetFwSpiDir(int argc, char **argv);
+void cdhFsGetFreeSpace(int argc, char **argv);
+void cdhFwUpdateSpiDir(int argc, char **argv);
+void cdhFwCreateSpiDir(int argc, char **argv);
+void cdhWriteProgFlash(int argc, char **argv);
+void cdhEraseProgFlash(int argc, char **argv);
+void cdhArmFw(int argc, char **argv);
+void cdhUpgradeFw(int argc, char **argv);
+void cdhConfirmFw(int argc, char **argv);
+void  cdhRestFwMgr(int argc, char **argv);
+void cdhSetFwChecksum(int argc, char **argv);
+void cdhSetFwDesVer(int argc, char **argv);
+void cdhFormatFs(int argc, char **argv);
+void cdhSoftReset(int argc, char **argv);
 
 uint8_t decodeLogFileNames(char * arg);
 
