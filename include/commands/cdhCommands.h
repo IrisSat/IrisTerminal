@@ -36,6 +36,10 @@ void cdhArmFw(int argc, char **argv);
 void cdhUpgradeFw(int argc, char **argv);
 void cdhConfirmFw(int argc, char **argv);
 void  cdhRestFwMgr(int argc, char **argv);
+void cdhSetFwChecksum(int argc, char **argv);
+void cdhSetFwDesVer(int argc, char **argv);
+void cdhFormatFs(int argc, char **argv);
+void cdhSoftReset(int argc, char **argv);
 
 uint8_t decodeLogFileNames(char * arg);
 

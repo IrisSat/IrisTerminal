@@ -281,7 +281,7 @@ void cdhUploadFw(int argc, char **argv){
     }
 
     if(argc != 4){
-        printf("incorrect parameteres...");
+        printf("incorrect parameteres... %d",argc);
     }
     else{
 
@@ -919,6 +919,95 @@ void  cdhRestFwMgr(int argc, char **argv){
     getCalendarNow(&now);
     cmd.timestamp = now;
     cmd.telem_id = CDH_RESET_FW_MNGR_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhSetFwChecksum(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to update the checksum in the firmware manager.\n");
+        printf("Usage: cdhSetFwChecksum <image> <checksum> \n");
+        printf("    image: 0 golden / 1 update image.\n");
+        printf("    checksum: hex value with 0x prefix\n");
+        return;
+    }
+
+    if(argc != 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    char* endptr;
+    uint32_t check=strtol(argv[2],&endptr,0);
+    uint8_t data[sizeof(uint8_t)+sizeof(uint32_t)] = {0};
+    data[0] = atoi(argv[1]);
+    memcpy(&data[1],&check,sizeof(uint32_t));
+
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_SET_CHECKSUM_CMD;
+    cmd.length = sizeof(uint8_t)+sizeof(uint32_t); //We send an updated time.
+    cmd.data = data;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+void cdhSetFwDesVer(int argc, char **argv){
+
+    if(strcmp(argv[1],"help") ==0){
+            printf("This command can be used to update the design version in the firmware manager.\n");
+            printf("Usage: cdhSetFwDesVer <image> <version> \n");
+            printf("    iamge: 0 golden / 1 update image.\n");
+            printf("    version: 0-254 are valid design versions.\n");
+            return;
+        }
+
+    if(argc != 3){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    uint8_t data[2] = {0};
+    data[0] = atoi(argv[1]);
+    data[1] = atoi(argv[2]);
+
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_SET_DESVER_CMD;
+    cmd.length = 2*sizeof(uint8_t); //We send an updated time.
+    cmd.data = data;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+
+void cdhFormatFs(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FORMAT_FS_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+}
+
+void cdhSoftReset(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_RESET_SYSTEM_CMD;
     cmd.length = 0; //We send an updated time.
     sendCommand(&cmd,CDH_CSP_ADDRESS);
 }

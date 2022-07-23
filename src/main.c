@@ -46,7 +46,7 @@ typedef struct{
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
 
-#define NUM_COMMANDS    79
+#define NUM_COMMANDS    83
 
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
@@ -91,7 +91,11 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {CDH_GRP,"cdhArmFw", cdhArmFw, "Arm the system for a firmware upgrade."},
     {CDH_GRP,"cdhUpgradeFw", cdhUpgradeFw, "Start the firmware upgrade."},
     {CDH_GRP,"cdhConfirmFw", cdhConfirmFw, "Confirm and finally do the firmware upgrade."},
-    {CDH_GRP, "cdhResetFwMgr", cdhRestFwMgr, "Reset the Firmware manager."},
+    {CDH_GRP,"cdhResetFwMgr", cdhRestFwMgr, "Reset the Firmware manager."},
+    {CDH_GRP,"cdhSetFwChecksum", cdhSetFwChecksum, "Set the checksum for the firmware files."},
+    {CDH_GRP,"cdhSetFwDesignVer", cdhSetFwDesVer, "Set the design version for the firmware files."},
+    {CDH_GRP,"cdhFormatFs", cdhFormatFs, "Format(erase) the file system."},
+    {CDH_GRP,"cdhSoftReset", cdhSoftReset, "Request software reset of cdh system."},
     // Payload Commands
     {PLD_GRP,"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {PLD_GRP,"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},
