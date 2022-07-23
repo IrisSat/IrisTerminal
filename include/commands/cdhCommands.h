@@ -32,6 +32,10 @@ void cdhFwUpdateSpiDir(int argc, char **argv);
 void cdhFwCreateSpiDir(int argc, char **argv);
 void cdhWriteProgFlash(int argc, char **argv);
 void cdhEraseProgFlash(int argc, char **argv);
+void cdhArmFw(int argc, char **argv);
+void cdhUpgradeFw(int argc, char **argv);
+void cdhConfirmFw(int argc, char **argv);
+void  cdhRestFwMgr(int argc, char **argv);
 
 uint8_t decodeLogFileNames(char * arg);
 

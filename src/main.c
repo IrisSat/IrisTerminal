@@ -46,7 +46,7 @@ typedef struct{
 
 //Commands table. Add new commands here, make sure to update the NUM_COMMANDS.
 
-#define NUM_COMMANDS    75
+#define NUM_COMMANDS    79
 
 cmd_t commandTable[NUM_COMMANDS]= {
     // General Commands
@@ -82,12 +82,16 @@ cmd_t commandTable[NUM_COMMANDS]= {
     {CDH_GRP,"cdhCopyToFlash", cdhCopyToProgFlash, "Copy file to program flash."},
     {CDH_GRP,"cdhGetSwVersion", cdhGetSwVersion, "Get the software version from CDH."},
     {CDH_GRP,"cdhGetDesignVersion", cdhGetDesignVersion, "Get the design version from CDH."},
-    {CDH_GRP, "cdhGetFwSpiDir", cdhGetFwSpiDir, "Get the firmware update(IAP) spi dir."},
-    {CDH_GRP, "cdhGetFsFreeSpace",cdhFsGetFreeSpace, "Get remaining space in filesystem, in bytes."},
-    {CDH_GRP, "cdhFwUpdateSpiDir", cdhFwUpdateSpiDir, "Update the fw design version in the spi dir."},
-    {CDH_GRP, "cdhFwCreateSpiDir", cdhFwCreateSpiDir, "Create the spi dir for fw update, specify whole file."},
-    {CDH_GRP, "cdhWriteProgFlash", cdhWriteProgFlash, "Write a file to the cdh program flash."},
-    {CDH_GRP, "cdhEraseProgFlash", cdhEraseProgFlash,  "Erase blocks from the program flash."},
+    {CDH_GRP,"cdhGetFwSpiDir", cdhGetFwSpiDir, "Get the firmware update(IAP) spi dir."},
+    {CDH_GRP,"cdhGetFsFreeSpace",cdhFsGetFreeSpace, "Get remaining space in filesystem, in bytes."},
+    {CDH_GRP,"cdhFwUpdateSpiDir", cdhFwUpdateSpiDir, "Update the fw design version in the spi dir."},
+    {CDH_GRP,"cdhFwCreateSpiDir", cdhFwCreateSpiDir, "Create the spi dir for fw update, specify whole file."},
+    {CDH_GRP,"cdhWriteProgFlash", cdhWriteProgFlash, "Write a file to the cdh program flash."},
+    {CDH_GRP,"cdhEraseProgFlash", cdhEraseProgFlash,  "Erase blocks from the program flash."},
+    {CDH_GRP,"cdhArmFw", cdhArmFw, "Arm the system for a firmware upgrade."},
+    {CDH_GRP,"cdhUpgradeFw", cdhUpgradeFw, "Start the firmware upgrade."},
+    {CDH_GRP,"cdhConfirmFw", cdhConfirmFw, "Confirm and finally do the firmware upgrade."},
+    {CDH_GRP, "cdhResetFwMgr", cdhRestFwMgr, "Reset the Firmware manager."},
     // Payload Commands
     {PLD_GRP,"pldCheckTelemetry",pldCheckTelemetry,"Checks what payload telemetry is collected on PLD."},
     {PLD_GRP,"pldGetTelemetry",pldGetTelemetry,"Gets the latest payload telemetry data from PLD."},

@@ -34,6 +34,7 @@ typedef struct{
     uint8_t fileIndex; //Valid options are 0(GOLDEN image) or 1 (UPDATE image)
     uint32_t filesize;//Filesize in bytes. For use in receiving and as extra check.
     uint32_t checksum;//crc-32 full file checksum.
+    uint8_t designver;//FPGA design version.
 
 }Fw_metadata_t;
 
@@ -269,7 +270,17 @@ int cmdRead(char *cmd,char *output, int outLen)
 
 void cdhUploadFw(int argc, char **argv){
 
-    if(argc != 3){
+    if(strcmp(argv[1],"help") ==0){
+        printf("This command can be used to upload fw to the CDH. \n");
+        printf("Usage: cdhUploadFw <filename> <slot> <designVer>\n");
+        printf("    filename: File on your PC to upload.\n");
+        printf("    slot: 0 for golden image, 1 for update image.\n");
+        printf("    designVer: Match the design vesion set in Libero when generating bitstream.\n");
+
+        return;
+    }
+
+    if(argc != 4){
         printf("incorrect parameteres...");
     }
     else{
@@ -305,6 +316,7 @@ void cdhUploadFw(int argc, char **argv){
         Fw_metadata_t fw_info;
         fw_info.fileIndex =atoi(argv[2]);
         fw_info.filesize = fileSize_B;
+        fw_info.designver = atoi(argv[3]);
         
         //Get checksum for file...
         uint32_t checksum;
@@ -344,7 +356,7 @@ void cdhUploadFw(int argc, char **argv){
                 printf("Done chunk %d of %d\n",i,numChunks);
                 printf("Estimated time remainging: %f minutes \n",((double)numChunks-i)*.1/60);
             }
-            csp_sleep_ms(100);
+            csp_sleep_ms(120);
         }
 
 
@@ -694,12 +706,21 @@ void cdhFsGetFreeSpace(int argc, char **argv){
 
 void cdhFwUpdateSpiDir(int argc, char **argv){
 
-    if(argc != 2){
+    if(strcmp(argv[1],"help") ==0){
+            printf("This command can be used to update the design version in the spi directory on the program flash.\n");
+            printf("Usage: cdhFwUpdateSpiDir <image> <version> \n");
+            printf("    iamge: 0 golden / 1 update image.\n");
+            printf("    version: 0-254 are valid design versions.\n");
+            return;
+        }
+
+    if(argc != 3){
         printf("Wrong number of arguments.\n");
         return;
     }
 
-    uint8_t design_ver = atoi(argv[1]);
+    uint8_t ver = atoi(argv[1]);
+    uint8_t design_ver = atoi(argv[2]);
 
     telemetryPacket_t cmd;
     //Set command timestamp to now.
@@ -765,7 +786,7 @@ void cdhWriteProgFlash(int argc, char **argv){
     char * endptr; //don't care about this ever...
     uint32_t address = strtol(argv[2],&endptr,0);
 
-    const int chunkSize = 150; //CAN MTU is 255? 
+    const int chunkSize = 128; //CAN MTU is 255? 
     char* fileName = argv[1];
     FILE * fp;
     fp = fopen(fileName,"rb");
@@ -793,8 +814,8 @@ void cdhWriteProgFlash(int argc, char **argv){
         //Now we upload the file
     for(int i=0; i< numChunks; i++){
 
-        int actual = fread(&chunk[sizeof(uint32_t)],1,chunkSize,fp);
-        memcpy(&chunk[0],&address,sizeof(uint32_t));
+        int actual = fread(chunk+sizeof(uint32_t),1,chunkSize,fp);
+        memcpy(chunk,&address,sizeof(uint32_t));
         telemetryPacket_t cmd;
         //Set command timestamp to now.
         Calendar_t now;
@@ -848,4 +869,56 @@ void cdhEraseProgFlash(int argc, char **argv){
         cmd.data = data;
         sendCommand(&cmd,CDH_CSP_ADDRESS);
 
+}
+
+void cdhArmFw(int argc, char **argv){
+
+    char * args[2];
+    args[0] = "cdhSetFwState";
+    args[1] = "ARM";
+    cdhSetFwState(2,args);
+}
+void cdhUpgradeFw(int argc, char **argv){
+
+    if(argc != 2){
+        printf("Wrong number of arguments.\n");
+        return;
+    }
+
+    uint8_t image = atoi(argv[1]);
+
+    if(image != 0 && image != 1){
+        printf("argument must be 0 for golden image, 1 for update image.\n");
+        return;
+    }
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_FW_EXECUTE_CMD;
+    cmd.length = 1; //We send an updated time.
+    cmd.data = &image;
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
+
+}
+void cdhConfirmFw(int argc, char **argv){
+
+    char * args[2];
+    args[0] = "cdhSetFwState";
+    args[1] = "EXECUTE_CONFIRM";
+    cdhSetFwState(2,args);
+}
+
+void  cdhRestFwMgr(int argc, char **argv){
+
+    telemetryPacket_t cmd;
+    //Set command timestamp to now.
+    Calendar_t now;
+    getCalendarNow(&now);
+    cmd.timestamp = now;
+    cmd.telem_id = CDH_RESET_FW_MNGR_CMD;
+    cmd.length = 0; //We send an updated time.
+    sendCommand(&cmd,CDH_CSP_ADDRESS);
 }
